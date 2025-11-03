@@ -464,7 +464,7 @@ function enviarPedidoWhatsApp(event) {
     mensagem += `*FORMA DE PAGAMENTO:*\n${formaPagamento[dados.pagamento]}`;
     
     // Enviar para WhatsApp
-    const whatsappNumero = '5583967654327';
+    const whatsappNumero = '558396765427';
     const url = `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(mensagem)}`;
     
     // Limpar carrinho e fechar modal
