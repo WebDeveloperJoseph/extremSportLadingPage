@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Admin - Extreme Sport</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00ff00;
+            --secondary-color: #1a1a1a;
+            --accent-color: #ffffff;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #000000 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: rgba(26, 26, 26, 0.95);
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.3);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            letter-spacing: 3px;
+        }
+
+        .logo p {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 0, 0.3);
+            border-radius: 10px;
+            color: var(--accent-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 10px;
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-login:hover {
+            background: #00cc00;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 15px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>EXTREME SPORT</h1>
+            <p>Painel Administrativo</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-login" id="btnLogin">Entrar</button>
+        </form>
+
+        <div id="loading" class="loading">
+            Autenticando...
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const btnLogin = document.getElementById('btnLogin');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+
+        // Verificar se já está logado
+        checkAuthStatus();
+
+        async function checkAuthStatus() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                // Verificar se é admin
+                const { data: admin, error } = await supabase
+                    .from('admins')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (admin) {
+                    window.location.href = 'index.html';
+                } else {
+                    // Usuário autenticado mas não é admin
+                    await supabase.auth.signOut();
+                    showError('Acesso negado. Você não tem permissões de administrador.');
+                }
+            }
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Validação básica
+            if (!email || !password) {
+                showError('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            // Mostrar loading
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Entrando...';
+            loading.classList.add('show');
+            errorMessage.classList.remove('show');
+
+            try {
+                // Fazer login com Supabase Auth
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                // Verificar se o usuário é admin
+                const { data: admin, error: adminError } = await supabase
+                    .from('admins')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (adminError || !admin) {
+                    await supabase.auth.signOut();
+                    throw new Error('Acesso negado. Você não tem permissões de administrador.');
+                }
+
+                // Login bem-sucedido
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                console.error('Erro no login:', error);
+                showError(error.message || 'Erro ao fazer login. Verifique suas credenciais.');
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Entrar';
+                loading.classList.remove('show');
+            }
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+        }
+    </script>
+</body>
+</html>

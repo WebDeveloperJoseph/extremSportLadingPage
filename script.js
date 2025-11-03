@@ -1,76 +1,5 @@
-// Produtos da loja
-const produtos = [
-    {
-        id: 1,
-        nome: 'Chuteira Profissional Branca',
-        descricao: 'Chuteira de alta performance para campo',
-        preco: 349.90,
-        emoji: '⚽',
-        imagem: 'img/chuteiraBranca.png'
-    },
-    {
-        id: 2,
-        nome: 'Chuteira Performance Verde',
-        descricao: 'Conforto e tração para jogo intenso',
-        preco: 389.90,
-        emoji: '⚽',
-        imagem: 'img/chuteiraVerde.png'
-    },
-    {
-        id: 3,
-        nome: 'Kit Chuteiras Premium',
-        descricao: 'Conjunto completo para treino e jogo',
-        preco: 699.90,
-        emoji: '�',
-        imagem: 'img/chuteiras.png'
-    },
-    {
-        id: 4,
-        nome: 'Luva de Goleiro Pro',
-        descricao: 'Proteção e aderência máximas',
-        preco: 179.90,
-        emoji: '🧤',
-        imagem: 'img/luvaGoleiro.png'
-    },
-    {
-        id: 5,
-        nome: 'Par de Luvas Goleiro Elite',
-        descricao: 'Tecnologia anti-impacto e grip superior',
-        preco: 299.90,
-        emoji: '🥅',
-        imagem: 'img/luvasGoleiro.png'
-    },
-    {
-        id: 6,
-        nome: 'Camisa Esportiva Premium',
-        descricao: 'Tecido Dry-Fit respirável',
-        preco: 149.90,
-        emoji: '�',
-        imagem: 'img/modeloCamisa.png'
-    },
-    {
-        id: 7,
-        nome: 'Camisa Treino Profissional',
-        descricao: 'Design moderno e alta durabilidade',
-        preco: 139.90,
-        emoji: '👕',
-        imagem: 'img/modeloCamisa2.png'
-    },
-    {
-        id: 8,
-        nome: 'Skate Profissional',
-        descricao: 'Skate completo para manobras radicais',
-        preco: 499.90,
-        emoji: '�'
-    },
-    {
-        id: 9,
-        nome: 'Capacete Extreme',
-        descricao: 'Proteção máxima para esportes radicais',
-        preco: 299.90,
-        emoji: '⛑️'
-    }
-];
+// Produtos da loja (será carregado do Supabase)
+let produtos = [];
 
 // Carrinho de compras
 let carrinho = [];
@@ -79,11 +8,42 @@ let carrinho = [];
 let currentSlide = 0;
 let carouselInterval;
 
+// Carregar produtos do Supabase
+async function carregarProdutosDoSupabase() {
+    try {
+        const { data, error } = await supabase
+            .from('produtos')
+            .select('*')
+            .order('id', { ascending: true });
+        
+        if (error) throw error;
+        
+        // Mapear produtos do banco para o formato usado no frontend
+        produtos = data.map(p => ({
+            id: p.id,
+            nome: p.nome,
+            descricao: p.descricao,
+            preco: parseFloat(p.preco),
+            emoji: p.emoji,
+            imagem: p.imagem_url,
+            destaque: p.destaque
+        }));
+        
+        // Renderizar produtos e carrossel
+        renderizarProdutos();
+        iniciarCarrossel();
+        
+    } catch (error) {
+        console.error('Erro ao carregar produtos:', error);
+        // Fallback: usar produtos locais se o banco falhar
+        console.warn('Usando produtos locais como fallback');
+    }
+}
+
 // Inicializar página
 document.addEventListener('DOMContentLoaded', () => {
-    renderizarProdutos();
+    carregarProdutosDoSupabase();
     carregarCarrinho();
-    iniciarCarrossel();
 });
 
 // Renderizar produtos na grid
@@ -412,7 +372,7 @@ function formatarCEP(input) {
 }
 
 // Enviar pedido via WhatsApp
-function enviarPedidoWhatsApp(event) {
+async function enviarPedidoWhatsApp(event) {
     event.preventDefault();
     
     // Coletar dados do formulário
@@ -429,6 +389,38 @@ function enviarPedidoWhatsApp(event) {
         estado: document.getElementById('estado').value,
         pagamento: document.querySelector('input[name="pagamento"]:checked').value
     };
+    
+    const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+    
+    // Salvar pedido no Supabase
+    try {
+        const { data, error } = await supabase
+            .from('pedidos')
+            .insert([{
+                cliente_nome: dados.nome,
+                cliente_email: dados.email,
+                cliente_telefone: dados.telefone,
+                endereco_cep: dados.cep,
+                endereco_rua: dados.endereco,
+                endereco_numero: dados.numero,
+                endereco_complemento: dados.complemento || null,
+                endereco_bairro: dados.bairro,
+                endereco_cidade: dados.cidade,
+                endereco_estado: dados.estado,
+                produtos_json: JSON.stringify(carrinho),
+                total: total,
+                forma_pagamento: dados.pagamento,
+                status: 'pendente'
+            }])
+            .select();
+        
+        if (error) throw error;
+        
+        console.log('Pedido salvo no banco:', data);
+    } catch (error) {
+        console.error('Erro ao salvar pedido:', error);
+        // Continua mesmo se falhar ao salvar no banco
+    }
     
     // Formatar mensagem
     let mensagem = `🏃‍♂️ *NOVO PEDIDO - EXTREME SPORT* 🏃‍♂️\n\n`;
@@ -452,7 +444,6 @@ function enviarPedidoWhatsApp(event) {
         mensagem += `   Subtotal: R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}\n`;
     });
     
-    const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
     mensagem += `\n💰 *TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n\n`;
     
     // Forma de pagamento

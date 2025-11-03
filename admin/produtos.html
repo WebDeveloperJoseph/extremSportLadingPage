@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Extreme Sport Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/admin.css">
+    <link rel="stylesheet" href="styles/produtos.css">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>EXTREME SPORT</h1>
+                <p>Painel Admin</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-link">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="produtos.html" class="nav-link active">
+                    <span class="icon">📦</span>
+                    Produtos
+                </a>
+                <a href="pedidos.html" class="nav-link">
+                    <span class="icon">🛒</span>
+                    Pedidos
+                </a>
+                <a href="../index.html" class="nav-link" target="_blank">
+                    <span class="icon">🌐</span>
+                    Ver Site
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <span class="icon">👤</span>
+                    <span id="userEmail">Carregando...</span>
+                </div>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h2>Produtos</h2>
+                <button class="btn btn-primary" onclick="abrirModalProduto()">
+                    ➕ Novo Produto
+                </button>
+            </header>
+
+            <!-- Products List -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Todos os Produtos</h3>
+                    <span id="totalCount">0 produtos</span>
+                </div>
+                <div class="card-body">
+                    <div id="produtosLista">
+                        <div class="loading">Carregando produtos...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Produto -->
+    <div id="modalProduto" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Novo Produto</h3>
+                <button class="modal-close" onclick="fecharModalProduto()">&times;</button>
+            </div>
+            <form id="formProduto" class="modal-body">
+                <input type="hidden" id="produtoId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">Nome do Produto *</label>
+                        <input type="text" id="nome" required maxlength="255">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preco">Preço (R$) *</label>
+                        <input type="number" id="preco" step="0.01" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="descricao">Descrição *</label>
+                    <textarea id="descricao" rows="3" required maxlength="500"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="emoji">Emoji (opcional)</label>
+                        <input type="text" id="emoji" maxlength="10" placeholder="⚽">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="destaque">
+                            Produto em Destaque
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="imagemFile">Imagem do Produto</label>
+                    <input type="file" id="imagemFile" accept="image/*">
+                    <small>Formatos aceitos: JPG, PNG, WebP (máx. 5MB)</small>
+                    <div id="imagemPreview" class="image-preview"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn" onclick="fecharModalProduto()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSalvar">Salvar Produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div id="modalOverlay" class="modal-overlay" onclick="fecharModalProduto()"></div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+    <script src="scripts/auth-guard.js"></script>
+    <script src="scripts/produtos.js"></script>
+</body>
+</html>
