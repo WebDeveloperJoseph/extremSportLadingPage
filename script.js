@@ -299,43 +299,218 @@ function carregarCarrinho() {
 // Finalizar compra no WhatsApp
 function finalizarCompra() {
     if (carrinho.length === 0) {
-        alert('Seu carrinho está vazio!');
+        mostrarToast('Seu carrinho está vazio!');
         return;
     }
     
-    // Número do WhatsApp da loja
-    const numeroWhatsApp = '558396765427'; // Extreme Sport
+    toggleCart();
+    abrirCheckout();
+}
+
+// Abrir modal de checkout
+function abrirCheckout() {
+    if (carrinho.length === 0) {
+        mostrarToast('Adicione produtos ao carrinho primeiro!');
+        return;
+    }
     
-    // Montar mensagem
-    let mensagem = '*🛒 PEDIDO - EXTREME SPORT*\n\n';
+    const modal = document.getElementById('checkoutModal');
+    modal.classList.add('active');
+    
+    // Preencher resumo do pedido
+    preencherResumoCheckout();
+    
+    // Focar no primeiro campo
+    setTimeout(() => {
+        document.getElementById('nomeCompleto').focus();
+    }, 300);
+}
+
+// Fechar modal de checkout
+function fecharCheckout() {
+    const modal = document.getElementById('checkoutModal');
+    modal.classList.remove('active');
+    
+    // Limpar formulário
+    document.getElementById('checkoutForm').reset();
+}
+
+// Preencher resumo do pedido no checkout
+function preencherResumoCheckout() {
+    const resumoDiv = document.getElementById('checkoutResumo');
+    const totalDiv = document.getElementById('checkoutTotal');
+    
+    resumoDiv.innerHTML = '';
     
     carrinho.forEach(item => {
-        const subtotal = item.preco * item.quantidade;
-        mensagem += `${item.emoji} *${item.nome}*\n`;
-        mensagem += `Quantidade: ${item.quantidade}\n`;
-        mensagem += `Preço unitário: R$ ${item.preco.toFixed(2).replace('.', ',')}\n`;
-        mensagem += `Subtotal: R$ ${subtotal.toFixed(2).replace('.', ',')}\n\n`;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'resumo-item';
+        itemDiv.innerHTML = `
+            <div class="resumo-item-info">
+                <div class="resumo-item-nome">${item.nome}</div>
+                <div class="resumo-item-qtd">Quantidade: ${item.quantidade}</div>
+            </div>
+            <div class="resumo-item-preco">
+                R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}
+            </div>
+        `;
+        resumoDiv.appendChild(itemDiv);
     });
     
     const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
-    mensagem += `*💰 TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n\n`;
-    mensagem += 'Gostaria de finalizar este pedido!';
-    
-    // Codificar mensagem para URL
-    const mensagemCodificada = encodeURIComponent(mensagem);
-    
-    // Criar link do WhatsApp
-    const linkWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
-    
-    // Abrir WhatsApp
-    window.open(linkWhatsApp, '_blank');
-    
-    // Opcional: limpar carrinho após enviar
-    // carrinho = [];
-    // salvarCarrinho();
-    // atualizarCarrinho();
-    // toggleCart();
+    totalDiv.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
 }
+
+// Buscar endereço por CEP (ViaCEP API)
+async function buscarCEP() {
+    const cep = document.getElementById('cep').value.replace(/\D/g, '');
+    
+    if (cep.length !== 8) return;
+    
+    try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const data = await response.json();
+        
+        if (data.erro) {
+            mostrarToast('CEP não encontrado');
+            return;
+        }
+        
+        document.getElementById('endereco').value = data.logradouro || '';
+        document.getElementById('bairro').value = data.bairro || '';
+        document.getElementById('cidade').value = data.localidade || '';
+        document.getElementById('estado').value = data.uf || '';
+        
+        // Focar no número
+        document.getElementById('numero').focus();
+        
+        mostrarToast('Endereço preenchido automaticamente!');
+    } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+        mostrarToast('Erro ao buscar CEP');
+    }
+}
+
+// Formatar telefone
+function formatarTelefone(input) {
+    let valor = input.value.replace(/\D/g, '');
+    
+    if (valor.length <= 10) {
+        valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+    } else {
+        valor = valor.replace(/^(\d{2})(\d{5})(\d{0,4}).*/, '($1) $2-$3');
+    }
+    
+    input.value = valor;
+}
+
+// Formatar CEP
+function formatarCEP(input) {
+    let valor = input.value.replace(/\D/g, '');
+    valor = valor.replace(/^(\d{5})(\d{0,3}).*/, '$1-$2');
+    input.value = valor;
+}
+
+// Enviar pedido via WhatsApp
+function enviarPedidoWhatsApp(event) {
+    event.preventDefault();
+    
+    // Coletar dados do formulário
+    const dados = {
+        nome: document.getElementById('nomeCompleto').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        cep: document.getElementById('cep').value,
+        endereco: document.getElementById('endereco').value,
+        numero: document.getElementById('numero').value,
+        complemento: document.getElementById('complemento').value,
+        bairro: document.getElementById('bairro').value,
+        cidade: document.getElementById('cidade').value,
+        estado: document.getElementById('estado').value,
+        pagamento: document.querySelector('input[name="pagamento"]:checked').value
+    };
+    
+    // Formatar mensagem
+    let mensagem = `🏃‍♂️ *NOVO PEDIDO - EXTREME SPORT* 🏃‍♂️\n\n`;
+    mensagem += `*CLIENTE:*\n`;
+    mensagem += `👤 ${dados.nome}\n`;
+    mensagem += `📧 ${dados.email}\n`;
+    mensagem += `📱 ${dados.telefone}\n\n`;
+    
+    mensagem += `*ENDEREÇO DE ENTREGA:*\n`;
+    mensagem += `📍 ${dados.endereco}, ${dados.numero}`;
+    if (dados.complemento) mensagem += ` - ${dados.complemento}`;
+    mensagem += `\n🏘️ ${dados.bairro}\n`;
+    mensagem += `🌆 ${dados.cidade} - ${dados.estado}\n`;
+    mensagem += `📮 CEP: ${dados.cep}\n\n`;
+    
+    mensagem += `*PRODUTOS:*\n`;
+    carrinho.forEach(item => {
+        mensagem += `\n${item.emoji || '📦'} *${item.nome}*\n`;
+        mensagem += `   Quantidade: ${item.quantidade}x\n`;
+        mensagem += `   Valor unit.: R$ ${item.preco.toFixed(2).replace('.', ',')}\n`;
+        mensagem += `   Subtotal: R$ ${(item.preco * item.quantidade).toFixed(2).replace('.', ',')}\n`;
+    });
+    
+    const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
+    mensagem += `\n💰 *TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*\n\n`;
+    
+    // Forma de pagamento
+    const formaPagamento = {
+        'pix': '🔷 PIX',
+        'cartao': '💳 Cartão de Crédito',
+        'boleto': '📄 Boleto Bancário'
+    };
+    mensagem += `*FORMA DE PAGAMENTO:*\n${formaPagamento[dados.pagamento]}`;
+    
+    // Enviar para WhatsApp
+    const whatsappNumero = '5583967654327';
+    const url = `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(mensagem)}`;
+    
+    // Limpar carrinho e fechar modal
+    carrinho = [];
+    salvarCarrinho();
+    atualizarCarrinho();
+    fecharCheckout();
+    
+    mostrarToast('Redirecionando para WhatsApp...');
+    
+    setTimeout(() => {
+        window.open(url, '_blank');
+    }, 500);
+}
+
+// Event listeners para buscar CEP e formatar inputs
+document.addEventListener('DOMContentLoaded', () => {
+    // Buscar CEP ao digitar
+    const cepInput = document.getElementById('cep');
+    if (cepInput) {
+        cepInput.addEventListener('input', (e) => formatarCEP(e.target));
+        cepInput.addEventListener('blur', buscarCEP);
+    }
+    
+    // Formatar telefone
+    const telefoneInput = document.getElementById('telefone');
+    if (telefoneInput) {
+        telefoneInput.addEventListener('input', (e) => formatarTelefone(e.target));
+    }
+    
+    // Submit do formulário
+    const checkoutForm = document.getElementById('checkoutForm');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', enviarPedidoWhatsApp);
+    }
+    
+    // Fechar modal ao clicar fora
+    const checkoutModal = document.getElementById('checkoutModal');
+    if (checkoutModal) {
+        checkoutModal.addEventListener('click', (e) => {
+            if (e.target === checkoutModal) {
+                fecharCheckout();
+            }
+        });
+    }
+});
 
 // Scroll suave para links internos
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
