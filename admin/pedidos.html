@@ -17,10 +17,15 @@
             <div class="sidebar-header">
                 <h1>EXTREME SPORT</h1>
                 <p>Painel Admin</p>
+                <button class="nav-toggle" onclick="toggleAdminNav()" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
             </div>
             
-            <nav class="sidebar-nav">
-                <a href="index.html" class="nav-link">
+            <nav class="sidebar-nav" id="adminNav">
+                <a href="painel.html" class="nav-link">
                     <span class="icon">📊</span>
                     Dashboard
                 </a>
@@ -67,7 +72,12 @@
             <div class="card">
                 <div class="card-header">
                     <h3>Todos os Pedidos</h3>
-                    <span id="totalCount">0 pedidos</span>
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap: wrap;">
+                        <span id="totalCount">0 pedidos</span>
+                        <button class="btn" type="button" onclick="carregarPedidos()">Recarregar</button>
+                        <button class="btn" type="button" onclick="diagnosticarPedidos()">Diagnóstico</button>
+                        <button class="btn btn-primary" type="button" onclick="criarPedidoTeste()">Criar Pedido Teste</button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div id="pedidosLista">
@@ -93,6 +103,9 @@
 
     <!-- Overlay -->
     <div id="modalOverlay" class="modal-overlay" onclick="fecharModalPedido()"></div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS produtos (
     emoji VARCHAR(10),
     imagem_url TEXT,
     destaque BOOLEAN DEFAULT FALSE,
+    estoque INTEGER NOT NULL DEFAULT 0 CHECK (estoque >= 0),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -65,6 +66,56 @@ CREATE TRIGGER update_produtos_updated_at BEFORE UPDATE ON produtos
 
 CREATE TRIGGER update_pedidos_updated_at BEFORE UPDATE ON pedidos
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =============================================
+-- ESTOQUE: Decrementar estoque ao criar pedido
+-- =============================================
+
+-- Função para decrementar estoque com base em produtos_json do pedido
+CREATE OR REPLACE FUNCTION decrementar_estoque_pedido()
+RETURNS TRIGGER AS $$
+DECLARE
+    item JSONB;
+    v_produto_id BIGINT;
+    v_qtd INT;
+    v_estoque_atual INT;
+BEGIN
+    -- Iterar pelos itens do pedido (espera-se um array JSON de itens: {id, quantidade})
+    FOR item IN SELECT jsonb_array_elements(NEW.produtos_json)
+    LOOP
+        v_produto_id := (item ->> 'id')::BIGINT;
+        v_qtd := COALESCE((item ->> 'quantidade')::INT, 0);
+
+        IF v_qtd <= 0 THEN
+            CONTINUE;
+        END IF;
+
+        -- Verificar estoque atual
+        SELECT estoque INTO v_estoque_atual FROM produtos WHERE id = v_produto_id FOR UPDATE;
+
+        IF v_estoque_atual IS NULL THEN
+            RAISE EXCEPTION 'Produto % não encontrado para baixar estoque', v_produto_id;
+        END IF;
+
+        IF v_estoque_atual < v_qtd THEN
+            RAISE EXCEPTION 'Estoque insuficiente para o produto % (disponível %, solicitado %)', v_produto_id, v_estoque_atual, v_qtd;
+        END IF;
+
+        -- Atualizar estoque
+        UPDATE produtos
+        SET estoque = estoque - v_qtd
+        WHERE id = v_produto_id;
+    END LOOP;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_decrementar_estoque_pedido ON pedidos;
+CREATE TRIGGER trg_decrementar_estoque_pedido
+AFTER INSERT ON pedidos
+FOR EACH ROW
+EXECUTE FUNCTION decrementar_estoque_pedido();
 
 -- =============================================
 -- ROW LEVEL SECURITY (RLS)

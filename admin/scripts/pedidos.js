@@ -1,8 +1,36 @@
 // Gerenciamento de Pedidos
 let pedidoAtual = null;
 
+// Toast util (compartilhado neste arquivo)
+function showToast(message, type = 'info', title = '') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+
+    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    const titles = {
+        success: title || 'Sucesso!',
+        error: title || 'Erro!',
+        warning: title || 'Atenção!',
+        info: title || 'Informação'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <span class="toast-icon">${icons[type]}</span>
+        <div class="toast-content">
+            <div class="toast-title">${titles[type]}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => { toast.classList.add('removing'); setTimeout(() => toast.remove(), 300); }, 5000);
+}
+
 async function carregarPedidos() {
     try {
+        showToast('Carregando pedidos...', 'info');
         const filtroStatus = document.getElementById('filtroStatus').value;
         
         let query = supabase
@@ -28,8 +56,12 @@ async function carregarPedidos() {
                 <div class="empty-state">
                     <div class="icon">📭</div>
                     <p>Nenhum pedido encontrado</p>
+                    <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+                        <a class="btn" href="../index.html" target="_blank">Ir para a loja</a>
+                    </div>
                 </div>
             `;
+            showToast('Nenhum pedido encontrado', 'warning');
             return;
         }
         
@@ -55,7 +87,13 @@ async function carregarPedidos() {
                                 <td>${pedido.cliente_email}</td>
                                 <td><strong>R$ ${parseFloat(pedido.total).toFixed(2).replace('.', ',')}</strong></td>
                                 <td>${formatarPagamento(pedido.forma_pagamento)}</td>
-                                <td><span class="badge badge-${pedido.status}">${pedido.status}</span></td>
+                                <td onclick="event.stopPropagation()">
+                                    <select class="status-inline-select status-${pedido.status}" onchange="alterarStatusInline(${pedido.id}, this)">
+                                        ${['pendente','confirmado','enviado','entregue','cancelado'].map(s => `
+                                            <option value="${s}" ${s===pedido.status?'selected':''}>${s}</option>
+                                        `).join('')}
+                                    </select>
+                                </td>
                                 <td>${formatarData(pedido.created_at)}</td>
                             </tr>
                         `).join('')}
@@ -63,19 +101,48 @@ async function carregarPedidos() {
                 </table>
             </div>
         `;
+        showToast(`${pedidos.length} pedido(s) carregado(s)`, 'success');
         
     } catch (error) {
         console.error('Erro ao carregar pedidos:', error);
         document.getElementById('pedidosLista').innerHTML = `
             <div class="empty-state">
-                <p>Erro ao carregar pedidos: ${error.message}</p>
+                <div class="icon">❌</div>
+                <p>Erro ao carregar pedidos</p>
+                <p style="color: var(--danger-color); font-size: 0.9rem;">${error.message}</p>
+                <button class="btn" onclick="carregarPedidos()">Tentar novamente</button>
             </div>
         `;
+        showToast(error.message || 'Erro ao carregar pedidos', 'error');
+    }
+}
+
+// Atualização inline de status via <select>
+async function alterarStatusInline(id, selectEl) {
+    const novoStatus = selectEl.value;
+    try {
+        showToast(`Atualizando status do pedido #${id}...`, 'info');
+        const { error } = await supabase
+            .from('pedidos')
+            .update({ status: novoStatus })
+            .eq('id', id);
+        if (error) throw error;
+        showToast(`Pedido #${id} → ${novoStatus}`, 'success');
+        // Atualiza classe visual do select conforme novo status
+        const classes = ['status-pendente','status-confirmado','status-enviado','status-entregue','status-cancelado'];
+        classes.forEach(c => selectEl.classList.remove(c));
+        selectEl.classList.add(`status-${novoStatus}`);
+    } catch (e) {
+        console.error('Erro ao alterar status inline:', e);
+        showToast(e.message || 'Erro ao alterar status', 'error');
+        // Recarrega a lista para voltar ao valor original
+        carregarPedidos();
     }
 }
 
 async function abrirDetalhesPedido(id) {
     try {
+        showToast(`Abrindo detalhes do pedido #${id}...`, 'info');
         const { data: pedido, error } = await supabase
             .from('pedidos')
             .select('*')
@@ -86,7 +153,9 @@ async function abrirDetalhesPedido(id) {
         
         pedidoAtual = pedido;
         
-        const produtos = JSON.parse(pedido.produtos_json);
+        const produtos = Array.isArray(pedido.produtos_json)
+            ? pedido.produtos_json
+            : JSON.parse(pedido.produtos_json || '[]');
         
         document.getElementById('modalTitle').textContent = `Pedido #${pedido.id}`;
         document.getElementById('pedidoDetalhes').innerHTML = `
@@ -154,10 +223,11 @@ async function abrirDetalhesPedido(id) {
         
         document.getElementById('modalPedido').classList.add('active');
         document.getElementById('modalOverlay').classList.add('active');
+        showToast('Detalhes carregados', 'success');
         
     } catch (error) {
         console.error('Erro ao carregar detalhes do pedido:', error);
-        alert('Erro ao carregar detalhes do pedido');
+        showToast(error.message || 'Erro ao carregar detalhes do pedido', 'error');
     }
 }
 
@@ -175,6 +245,7 @@ async function atualizarStatus(novoStatus) {
     }
     
     try {
+        showToast('Atualizando status...', 'info');
         const { error } = await supabase
             .from('pedidos')
             .update({ status: novoStatus })
@@ -182,13 +253,53 @@ async function atualizarStatus(novoStatus) {
         
         if (error) throw error;
         
-        alert('Status atualizado com sucesso!');
+        showToast('Status atualizado com sucesso!', 'success');
         fecharModalPedido();
         carregarPedidos();
         
     } catch (error) {
         console.error('Erro ao atualizar status:', error);
-        alert('Erro ao atualizar status: ' + error.message);
+        showToast(error.message || 'Erro ao atualizar status', 'error');
+    }
+}
+
+// Atualizar status com base em um ID digitado (ferramenta rápida)
+async function atualizarStatusPorId() {
+    try {
+        const idStr = document.getElementById('statusPedidoId').value.trim();
+        const novoStatus = document.getElementById('statusNovo').value;
+        const id = parseInt(idStr, 10);
+
+        const permitidos = ['pendente', 'confirmado', 'enviado', 'entregue', 'cancelado'];
+        if (!id || id < 1) {
+            showToast('Informe um ID de pedido válido.', 'warning');
+            return;
+        }
+        if (!permitidos.includes(novoStatus)) {
+            showToast('Status inválido.', 'warning');
+            return;
+        }
+
+        if (!confirm(`Alterar status do pedido #${id} para "${novoStatus}"?`)) return;
+
+        showToast('Atualizando status...', 'info');
+        const { data, error } = await supabase
+            .from('pedidos')
+            .update({ status: novoStatus })
+            .eq('id', id)
+            .select('id');
+
+        if (error) throw error;
+        if (!data || data.length === 0) {
+            showToast(`Pedido #${id} não encontrado.`, 'warning');
+            return;
+        }
+
+        showToast(`Status do pedido #${id} atualizado para ${novoStatus}.`, 'success');
+        carregarPedidos();
+    } catch (e) {
+        console.error('Erro ao atualizar status por ID:', e);
+        showToast(e.message || 'Erro ao atualizar status por ID', 'error');
     }
 }
 
@@ -213,3 +324,104 @@ function formatarPagamento(tipo) {
 
 // Carregar pedidos ao iniciar
 document.addEventListener('DOMContentLoaded', carregarPedidos);
+
+// Diagnóstico similar ao de produtos
+async function diagnosticarPedidos() {
+    try {
+        showToast('Executando diagnóstico de pedidos...', 'info');
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            showToast('Sem sessão. Faça login novamente.', 'error');
+            return;
+        }
+
+        const { data: admin, error: adminErr } = await supabase
+            .from('admins')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+        if (adminErr || !admin) {
+            showToast('Usuário não é admin na tabela admins.', 'error');
+        } else {
+            showToast(`Admin OK (${admin.role})`, 'success');
+        }
+
+        const { data: _, count, error: cntErr } = await supabase
+            .from('pedidos')
+            .select('*', { count: 'exact', head: true });
+        if (cntErr) {
+            showToast(`Erro ao contar pedidos: ${cntErr.message}`, 'error');
+        } else {
+            showToast(`Pedidos acessíveis. Quantidade: ${count ?? 0}`, count ? 'success' : 'warning');
+        }
+
+        const { data: sample, error: sampleErr } = await supabase
+            .from('pedidos')
+            .select('id, cliente_nome, total, status')
+            .limit(3);
+        if (sampleErr) {
+            showToast(`Erro SELECT pedidos: ${sampleErr.message}`, 'error');
+        } else {
+            console.log('Amostra de pedidos:', sample);
+            if ((sample?.length || 0) > 0) showToast(`Amostra OK: ${sample.length} item(ns)`, 'success');
+        }
+
+        showToast('Se a contagem for 0, faça uma compra teste no site público.', 'info');
+    } catch (e) {
+        console.error('Diagnóstico de pedidos falhou:', e);
+        showToast(e.message || 'Diagnóstico de pedidos falhou', 'error');
+    }
+}
+
+// Criar um pedido de teste (para validar policies/tabela)
+async function criarPedidoTeste() {
+    try {
+        showToast('Criando pedido de teste...', 'info');
+        const agora = new Date();
+
+        // Buscar um produto real com estoque > 0
+        const { data: produtos, error: prodErr } = await supabase
+            .from('produtos')
+            .select('id, nome, preco, estoque')
+            .gt('estoque', 0)
+            .order('id', { ascending: true })
+            .limit(2);
+
+        if (prodErr) throw prodErr;
+        if (!produtos || produtos.length === 0) {
+            showToast('Nenhum produto com estoque disponível. Cadastre produtos ou rode o seed.', 'warning');
+            return;
+        }
+
+        const itens = produtos.map(p => ({ id: p.id, nome: p.nome, preco: parseFloat(p.preco), quantidade: 1 }));
+        const total = itens.reduce((s, i) => s + i.preco * i.quantidade, 0);
+
+        const { error } = await supabase
+            .from('pedidos')
+            .insert([{
+                cliente_nome: 'Cliente Teste',
+                cliente_email: 'teste@example.com',
+                cliente_telefone: '(83) 99999-9999',
+                endereco_cep: '58000-000',
+                endereco_rua: 'Rua Teste',
+                endereco_numero: '123',
+                endereco_complemento: null,
+                endereco_bairro: 'Centro',
+                endereco_cidade: 'João Pessoa',
+                endereco_estado: 'PB',
+                produtos_json: itens,
+                total: total,
+                forma_pagamento: 'pix',
+                status: 'pendente',
+                created_at: agora.toISOString()
+            }]);
+
+        if (error) throw error;
+        showToast('Pedido de teste criado!', 'success');
+        carregarPedidos();
+    } catch (e) {
+        console.error('Erro ao criar pedido teste:', e);
+        showToast(e.message || 'Erro ao criar pedido de teste', 'error');
+    }
+}

@@ -1,0 +1,23 @@
+/* Layout básico para ferramentas */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .tools-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .tools-grid { grid-template-columns: 1fr; }
+}
+
+.card.warning {
+  border: 2px solid var(--warning-color);
+}
+
+.tools-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+pre { background: #111; padding: 12px; border-radius: 8px; overflow: auto; }
+code { color: #0f0; white-space: pre-wrap; }

@@ -13,6 +13,7 @@ async function carregarDashboard() {
     ]);
     
     atualizarHorario();
+    adicionarSeedQuickActionSeSuperAdmin();
 }
 
 async function carregarEstatisticas() {
@@ -123,3 +124,33 @@ document.addEventListener('DOMContentLoaded', carregarDashboard);
 
 // Recarregar a cada 30 segundos
 setInterval(carregarDashboard, 30000);
+
+// Exibir atalho de SEED apenas para super_admin
+async function adicionarSeedQuickActionSeSuperAdmin() {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { data: admin, error } = await supabase
+            .from('admins')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+
+        if (error || !admin || admin.role !== 'super_admin') return;
+
+        const container = document.querySelector('.quick-actions');
+        if (!container) return;
+
+        if (!document.getElementById('seedQuickAction')) {
+            const a = document.createElement('a');
+            a.href = 'seed.html';
+            a.className = 'action-btn';
+            a.id = 'seedQuickAction';
+            a.innerHTML = '<span class="icon">🌱</span>Seed de Produtos (9)';
+            container.appendChild(a);
+        }
+    } catch (e) {
+        console.warn('Não foi possível verificar role para seed:', e);
+    }
+}

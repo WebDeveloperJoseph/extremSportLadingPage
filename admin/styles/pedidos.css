@@ -1,3 +1,57 @@
+/* Select inline para status */
+.status-inline-select {
+    background: var(--secondary-color);
+    color: var(--accent-color);
+    border: 1px solid rgba(0,255,0,0.3);
+    padding: 6px 10px;
+    border-radius: 6px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.status-inline-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0,255,0,0.2);
+}
+
+/* Cores por status (coerentes com as badges) */
+.status-inline-select.status-pendente {
+    background: rgba(255, 170, 0, 0.12);
+    border-color: var(--warning-color);
+    color: var(--accent-color);
+}
+.status-inline-select.status-confirmado {
+    background: rgba(0, 170, 255, 0.12);
+    border-color: var(--info-color);
+}
+.status-inline-select.status-enviado {
+    background: rgba(0, 255, 0, 0.12);
+    border-color: var(--success-color);
+}
+.status-inline-select.status-entregue {
+    background: rgba(0, 255, 0, 0.18);
+    border-color: var(--success-color);
+}
+.status-inline-select.status-cancelado {
+    background: rgba(255, 68, 68, 0.12);
+    border-color: var(--danger-color);
+}
+
+/* Forçar contraste nos itens do dropdown (opções) */
+.status-inline-select option,
+.status-inline-select optgroup {
+    background: #ffffff !important;
+    color: #111 !important;
+}
+
+/* Em alguns navegadores, quando o select está focado, reforçar o contraste */
+.status-inline-select:focus option,
+.status-inline-select:focus optgroup {
+    background: #ffffff !important;
+    color: #111 !important;
+}
 /* Estilos específicos para pedidos */
 .header-filters {
     display: flex;
@@ -102,5 +156,69 @@
     
     .header-filters select {
         width: 100%;
+    }
+
+    .status-inline-select {
+        min-width: 160px;
+    }
+
+    .modal-large .modal-content {
+        max-width: 95%;
+    }
+
+    .detail-section {
+        padding: 15px;
+    }
+
+    .detail-section h4 {
+        font-size: 1.1rem;
+    }
+
+    .status-buttons {
+        flex-direction: column;
+    }
+
+    .status-buttons .btn {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .pedidos-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-filters select {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .detail-section {
+        padding: 12px;
+    }
+
+    .detail-item {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    .produto-pedido-item {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .status-update {
+        margin-top: 15px;
+        padding-top: 15px;
+    }
+
+    table {
+        font-size: 0.8rem;
     }
 }

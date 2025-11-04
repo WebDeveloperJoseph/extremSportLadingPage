@@ -244,11 +244,126 @@
 }
 
 @media (max-width: 768px) {
+    .modal {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .modal-header {
+        padding: 20px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-footer {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+    }
+
+    .modal-footer .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+
     .form-row {
         grid-template-columns: 1fr;
+        gap: 0;
     }
     
     .produtos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .produto-item {
+        padding: 15px;
+    }
+
+    .produto-item-img {
+        height: 160px;
+    }
+
+    .produto-item-info h4 {
+        font-size: 1.1rem;
+    }
+
+    .produto-item-info p {
+        font-size: 0.85rem;
+        min-height: auto;
+    }
+
+    .produto-item-price {
+        font-size: 1.3rem;
+    }
+
+    .produto-item-actions {
+        flex-direction: column;
+    }
+
+    .produto-item-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+        top: 0;
+        left: 0;
+        transform: none;
+    }
+
+    .modal-content {
+        border-radius: 0;
+    }
+
+    .modal-header {
+        padding: 15px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.3rem;
+    }
+
+    .modal-body {
+        padding: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        font-size: 0.9rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+
+    .produtos-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .produto-item-img {
+        height: 180px;
+    }
+
+    .image-preview img {
+        max-width: 150px;
+        max-height: 150px;
     }
 }

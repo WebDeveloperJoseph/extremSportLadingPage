@@ -32,6 +32,8 @@
 
 **Resultado:** 3 tabelas criadas (produtos, pedidos, admins) + índices + triggers + políticas RLS
 
+> Atualização (Estoque): o schema agora inclui a coluna `estoque` em `produtos` e um trigger que decrementa o estoque automaticamente quando um pedido é criado. Reaplique o `database/schema.sql` se você configurou antes desta mudança (ou execute apenas os trechos de ALTER/CREATE FUNCTION/TRIGGER).
+
 ---
 
 ## 2️⃣ CONFIGURAR STORAGE
@@ -139,7 +141,7 @@ Você tem 2 opções:
 
 **Opção A - Local (Recomendado para testar):**
 ```
-http://localhost:5500/admin/login.html
+http://localhost:5500/admin/
 ```
 (Use Live Server no VS Code ou abra o arquivo diretamente)
 
@@ -269,7 +271,7 @@ O Vercel detecta automaticamente e faz o deploy.
 
 1. Acesse: https://seu-site.vercel.app
 2. Teste carrinho e checkout
-3. Acesse: https://seu-site.vercel.app/admin/login.html
+3. Acesse: https://seu-site.vercel.app/admin/
 4. Faça login e teste o painel admin
 
 ---

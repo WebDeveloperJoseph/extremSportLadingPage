@@ -54,3 +54,11 @@ Após executar esses 3 passos, me avise que vou configurar o Storage para as ima
 **Credenciais do Projeto:**
 - Project URL: `https://hmhoholrueivqvmbbfql.supabase.co`
 - API Key: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+
+---
+
+## Clientes (opcional, recomendado)
+Para ativar o cadastro automático de clientes no checkout (upsert por email) e vincular pedidos ao cliente:
+
+1. No SQL Editor, execute o conteúdo de `database/add_clientes.sql`.
+2. Consulte o guia `database/CLIENTES_SETUP.md` para detalhes e reset.

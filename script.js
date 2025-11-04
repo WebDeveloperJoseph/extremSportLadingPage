@@ -26,7 +26,8 @@ async function carregarProdutosDoSupabase() {
             preco: parseFloat(p.preco),
             emoji: p.emoji,
             imagem: p.imagem_url,
-            destaque: p.destaque
+            destaque: p.destaque,
+            estoque: typeof p.estoque === 'number' ? p.estoque : 0
         }));
         
         // Renderizar produtos e carrossel
@@ -44,6 +45,16 @@ async function carregarProdutosDoSupabase() {
 document.addEventListener('DOMContentLoaded', () => {
     carregarProdutosDoSupabase();
     carregarCarrinho();
+
+    // Animação apenas de bounce (removido efeito de giro)
+    try {
+        const logoWrap = document.querySelector('.hero-logo-anim');
+        if (logoWrap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            logoWrap.classList.add('anim-bounce');
+        }
+    } catch (e) {
+        console.warn('Falha ao aplicar animação da logo:', e);
+    }
 });
 
 // Renderizar produtos na grid
@@ -55,9 +66,11 @@ function renderizarProdutos() {
         card.className = 'produto-card';
         const temImagem = Boolean(produto.imagem);
         const emojiFallback = produto.emoji || '🏷️';
-        const badgeDestaque = produto.destaque ? '<span class="badge-destaque">DESTAQUE</span>' : '';
+    const badgeDestaque = produto.destaque ? '<span class="badge-destaque">DESTAQUE</span>' : '';
+    const badgeEsgotado = (produto.estoque === 0) ? '<span class="badge-esgotado">ESGOTADO</span>' : '';
         card.innerHTML = `
             ${badgeDestaque}
+            ${badgeEsgotado}
             <div class="produto-img">
                 ${temImagem ? `<img src="${produto.imagem}" alt="${produto.nome}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
                 <div class="produto-emoji-fallback" style="${temImagem ? 'display:none;' : 'display:flex;'}">${emojiFallback}</div>
@@ -66,9 +79,10 @@ function renderizarProdutos() {
                 <h3>${produto.nome}</h3>
                 <p>${produto.descricao}</p>
                 <div class="produto-price">R$ ${produto.preco.toFixed(2).replace('.', ',')}</div>
-                <button class="add-to-cart" onclick="adicionarAoCarrinho(${produto.id})">
+                <button class="add-to-cart" onclick="adicionarAoCarrinho(${produto.id})" ${produto.estoque === 0 ? 'disabled' : ''}>
                     Adicionar ao Carrinho
                 </button>
+                ${typeof produto.estoque === 'number' ? `<small style="display:block;margin-top:6px;color:#666;">Disponível: ${produto.estoque}</small>` : ''}
             </div>
         `;
         grid.appendChild(card);
@@ -79,6 +93,12 @@ function renderizarProdutos() {
 function adicionarAoCarrinho(produtoId) {
     const produto = produtos.find(p => p.id === produtoId);
     const itemExistente = carrinho.find(item => item.id === produtoId);
+    const estoque = typeof produto.estoque === 'number' ? produto.estoque : Infinity;
+    const quantidadeAtual = itemExistente ? itemExistente.quantidade : 0;
+    if (quantidadeAtual + 1 > estoque) {
+        mostrarToast('Estoque insuficiente para este produto.');
+        return;
+    }
     
     if (itemExistente) {
         itemExistente.quantidade++;
@@ -118,6 +138,12 @@ function removerDoCarrinho(produtoId) {
 function aumentarQuantidade(produtoId) {
     const item = carrinho.find(item => item.id === produtoId);
     if (item) {
+        const produto = produtos.find(p => p.id === produtoId);
+        const estoque = typeof produto?.estoque === 'number' ? produto.estoque : Infinity;
+        if (item.quantidade + 1 > estoque) {
+            mostrarToast('Quantidade máxima disponível atingida.');
+            return;
+        }
         item.quantidade++;
         salvarCarrinho();
         atualizarCarrinho();
@@ -392,33 +418,85 @@ async function enviarPedidoWhatsApp(event) {
     
     const total = carrinho.reduce((sum, item) => sum + (item.preco * item.quantidade), 0);
     
+    // Tentar criar/atualizar cliente via RPC (retorna cliente_id)
+    let clienteId = null;
+    try {
+        const { data: clienteData, error: clienteErr } = await supabase.rpc('upsert_cliente', {
+            p_nome: dados.nome,
+            p_email: dados.email,
+            p_telefone: dados.telefone
+        });
+        if (clienteErr) throw clienteErr;
+        clienteId = clienteData || null;
+    } catch (e) {
+        console.warn('Falha no upsert de cliente (seguindo sem cliente_id):', e.message || e);
+    }
+
     // Salvar pedido no Supabase
     try {
-        const { data, error } = await supabase
+        // Monta payload base SEM cliente_id
+        const pedidoBase = {
+            cliente_nome: dados.nome,
+            cliente_email: dados.email,
+            cliente_telefone: dados.telefone,
+            endereco_cep: dados.cep,
+            endereco_rua: dados.endereco,
+            endereco_numero: dados.numero,
+            endereco_complemento: dados.complemento || null,
+            endereco_bairro: dados.bairro,
+            endereco_cidade: dados.cidade,
+            endereco_estado: dados.estado,
+            produtos_json: carrinho,
+            total: total,
+            forma_pagamento: dados.pagamento,
+            status: 'pendente'
+        };
+
+        // Só adiciona cliente_id se veio válido do RPC
+        const payloadTentativa = { ...pedidoBase };
+        if (typeof clienteId === 'number' && !isNaN(clienteId)) {
+            payloadTentativa.cliente_id = clienteId;
+        }
+
+        let { data, error } = await supabase
             .from('pedidos')
-            .insert([{
-                cliente_nome: dados.nome,
-                cliente_email: dados.email,
-                cliente_telefone: dados.telefone,
-                endereco_cep: dados.cep,
-                endereco_rua: dados.endereco,
-                endereco_numero: dados.numero,
-                endereco_complemento: dados.complemento || null,
-                endereco_bairro: dados.bairro,
-                endereco_cidade: dados.cidade,
-                endereco_estado: dados.estado,
-                produtos_json: JSON.stringify(carrinho),
-                total: total,
-                forma_pagamento: dados.pagamento,
-                status: 'pendente'
-            }])
+            .insert([payloadTentativa])
             .select();
-        
+
+        // Fallback: se der erro por coluna cliente_id inexistente, tenta sem a coluna
+        if (error && String(error.message || '').toLowerCase().includes('cliente_id')) {
+            console.warn('Re-tentando inserir pedido sem cliente_id por coluna ausente...');
+            const { data: data2, error: error2 } = await supabase
+                .from('pedidos')
+                .insert([pedidoBase])
+                .select();
+            if (error2) throw error2;
+            data = data2;
+            error = null;
+        }
+
         if (error) throw error;
-        
+
         console.log('Pedido salvo no banco:', data);
+        mostrarToast('Pedido salvo no sistema!');
+
+        // TENTAR baixar estoque via updates (pode falhar por política RLS)
+        try {
+            for (const item of carrinho) {
+                const produto = produtos.find(p => p.id === item.id);
+                if (!produto || typeof produto.estoque !== 'number') continue;
+                const novoEstoque = Math.max(0, produto.estoque - item.quantidade);
+                if (novoEstoque === produto.estoque) continue;
+                // Esta chamada pode ser bloqueada por RLS (apenas admins atualizam). O trigger no banco deve tratar.
+                await supabase.from('produtos').update({ estoque: novoEstoque }).eq('id', item.id);
+            }
+        } catch (e) {
+            // Sem problema: trigger do banco deve manejar o estoque
+            console.warn('Atualização de estoque pelo cliente falhou (esperado com RLS):', e.message || e);
+        }
     } catch (error) {
         console.error('Erro ao salvar pedido:', error);
+        mostrarToast('Não foi possível salvar seu pedido no sistema. Continuaremos pelo WhatsApp.');
         // Continua mesmo se falhar ao salvar no banco
     }
     

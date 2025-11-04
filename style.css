@@ -274,6 +274,20 @@ nav a:hover {
     animation: pulse 2s ease-in-out infinite;
 }
 
+.badge-esgotado {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff4d4d;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(255,77,77,0.4);
+}
+
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
@@ -1613,17 +1627,21 @@ footer {
     margin: 0 !important;
     z-index: 1;
     object-fit: cover; /* preenche o círculo sem distorcer */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden; /* suaviza flicker em WebKit */
 }
 
-/* Efeitos de animação da logo (bounce) */
-.hero-logo-wrap {
-    /* loop sutil a cada alguns segundos */
-    animation: bounceLoop 8s ease-in-out infinite;
+/* Efeitos de animação da logo (controlados por classes) */
+.hero-logo-anim {
     will-change: transform;
+}
+
+.hero-logo-anim.anim-bounce {
+    animation: bounceLoop 8s ease-in-out infinite;
     transform-origin: center bottom;
 }
 
-.hero-logo-wrap:hover {
+.hero-logo-anim:hover {
     /* bounce mais forte ao passar o mouse */
     animation: bounceHover 1s cubic-bezier(.28,.84,.42,1) 1 forwards;
 }
@@ -1645,8 +1663,10 @@ footer {
     100% { transform: translateY(0) scale(1); }
 }
 
+/* (Removido) Efeito de rotação 3D: mantemos apenas o bounce solicitado */
+
 /* Acessibilidade: desativa animações para quem prefere menos movimento */
 @media (prefers-reduced-motion: reduce) {
-    .hero-logo-wrap { animation: none !important; }
-    .hero-logo-wrap:hover { animation: none !important; }
+    .hero-logo-anim { animation: none !important; }
+    .hero-logo-anim:hover { animation: none !important; }
 }

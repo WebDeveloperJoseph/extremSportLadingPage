@@ -41,6 +41,7 @@ body {
     padding: 30px 20px;
     border-bottom: 2px solid rgba(0, 255, 0, 0.2);
     text-align: center;
+    position: relative;
 }
 
 .sidebar-header h1 {
@@ -57,9 +58,46 @@ body {
     margin-top: 5px;
 }
 
+.nav-toggle {
+    display: none;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 101;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 28px;
+    height: 3px;
+    background: var(--primary-color);
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.nav-toggle.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
 .sidebar-nav {
     flex: 1;
     padding: 20px 0;
+    transition: all 0.3s ease;
 }
 
 .nav-link {
@@ -398,27 +436,321 @@ table tr:hover {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 240px;
+    }
+
+    .main-content {
+        margin-left: 240px;
+    }
+}
+
 @media (max-width: 768px) {
+    .admin-wrapper {
+        flex-direction: column;
+    }
+
     .sidebar {
         width: 100%;
         position: relative;
         height: auto;
+        border-right: none;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .sidebar-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left;
+    }
+
+    .sidebar-header h1 {
+        font-size: 1.8rem;
+        display: none;
+    }
+
+    .nav-toggle {
+        display: flex;
+    }
+
+    .sidebar-nav {
+        display: none;
+        overflow-x: auto;
+        padding: 10px 0;
+        gap: 5px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar-nav.active {
+        display: flex;
+    }
+
+    .nav-link {
+        white-space: nowrap;
+        padding: 12px 20px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        flex-shrink: 0;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        border-left: none;
+        border-bottom-color: var(--primary-color);
+    }
+
+    .sidebar-footer {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+
+    .user-info {
+        flex: 1;
+        margin-bottom: 0;
+    }
+
+    .btn-logout {
+        width: auto;
+        padding: 10px 20px;
     }
 
     .main-content {
         margin-left: 0;
+        padding: 20px;
     }
 
     .stats-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
     }
 
     .content-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 15px;
     }
 
     .header-actions {
-        margin-top: 10px;
+        margin-top: 0;
+        width: 100%;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    table th,
+    table td {
+        padding: 10px 8px;
+    }
+}
+
+@media (max-width: 600px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 18px;
+    }
+
+    .stat-icon {
+        font-size: 2.2rem;
+        margin-right: 12px;
+    }
+
+    .stat-value {
+        font-size: 1.6rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 15px;
+    }
+
+    .content-header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+    }
+
+    .content-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px 20px;
+    }
+
+    .card-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 15px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    table th,
+    table td {
+        padding: 8px 6px;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+    }
+}
+
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--secondary-color);
+    color: var(--accent-color);
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-left: 4px solid var(--primary-color);
+    min-width: 300px;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slideIn 0.3s ease;
+    pointer-events: auto;
+}
+
+.toast.success {
+    border-left-color: var(--success-color);
+}
+
+.toast.error {
+    border-left-color: var(--danger-color);
+}
+
+.toast.warning {
+    border-left-color: var(--warning-color);
+}
+
+.toast.info {
+    border-left-color: var(--info-color);
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+}
+
+.toast-message {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+.toast.removing {
+    animation: slideOut 0.3s ease forwards;
+}
+
+@media (max-width: 600px) {
+    .toast-container {
+        left: 10px;
+        right: 10px;
+        top: 10px;
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: none;
     }
 }
