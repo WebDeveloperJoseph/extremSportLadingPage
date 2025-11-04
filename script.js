@@ -795,12 +795,17 @@ async function montarLogosCarousel() {
         if (l.color) {
             div.style.setProperty('--ball-color', l.color);
         }
+        // Acessibilidade e foco
+        div.setAttribute('role', 'button');
+        div.setAttribute('tabindex', '0');
 
         // Suporta dois formatos: { emoji: '⚽️' } ou { img: 'img/logos/time.png' }
         if (l.img) {
             const img = document.createElement('img');
             img.src = l.img;
             img.alt = l.title || 'logo';
+            img.loading = 'lazy';
+            img.decoding = 'async';
             img.onerror = () => { img.remove(); div.textContent = l.emoji || '⚽️'; };
             div.appendChild(img);
         } else {
@@ -808,6 +813,13 @@ async function montarLogosCarousel() {
         }
         // Clique aplica filtro
         div.addEventListener('click', () => aplicarFiltroPorLogo(l));
+        // Teclado acessível
+        div.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault();
+                aplicarFiltroPorLogo(l);
+            }
+        });
         return div;
     });
 
@@ -815,4 +827,12 @@ async function montarLogosCarousel() {
     const items1 = buildItems();
     const items2 = buildItems();
     items1.concat(items2).forEach(el => track.appendChild(el));
+
+    // Pausar animação em hover e toque
+    const pause = () => { track.style.animationPlayState = 'paused'; };
+    const play = () => { track.style.animationPlayState = 'running'; };
+    track.addEventListener('mouseenter', pause);
+    track.addEventListener('mouseleave', play);
+    track.addEventListener('touchstart', () => { pause(); }, { passive: true });
+    track.addEventListener('touchend', () => { play(); }, { passive: true });
 }
