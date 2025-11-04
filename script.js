@@ -1,5 +1,7 @@
 // Produtos da loja (será carregado do Supabase)
 let produtos = [];
+let produtosFiltrados = null; // lista filtrada quando filtro ativo
+let filtroSelecionado = null; // { title, keywords:[...], color }
 
 // Carrinho de compras
 let carrinho = [];
@@ -59,10 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Renderizar produtos na grid
-function renderizarProdutos() {
+function renderizarProdutos(lista = null) {
     const grid = document.getElementById('produtosGrid');
-    
-    produtos.forEach(produto => {
+    const dados = Array.isArray(lista) ? lista : (produtosFiltrados || produtos);
+    grid.innerHTML = '';
+
+    if (!dados || dados.length === 0) {
+        grid.innerHTML = '<p style="text-align:center;color:#666;">Nenhum produto para este filtro.</p>';
+        return;
+    }
+
+    dados.forEach(produto => {
         const card = document.createElement('div');
         card.className = 'produto-card';
         const temImagem = Boolean(produto.imagem);
@@ -691,6 +700,63 @@ function resetAutoplay() {
     startAutoplay();
 }
 
+// ======= FILTRO POR LOGO (BOLINHAS) =======
+function aplicarFiltroPorLogo(logo) {
+    // Keywords: se não vier, usa o título
+    const keywords = Array.isArray(logo.keywords) && logo.keywords.length > 0
+        ? logo.keywords
+        : (logo.title ? [logo.title] : []);
+    const kwLower = keywords.map(k => String(k).toLowerCase());
+
+    if (kwLower.length === 0) {
+        limparFiltroProdutos();
+        return;
+    }
+
+    filtroSelecionado = { title: logo.title || 'Filtro', keywords: kwLower, color: logo.color || null };
+    produtosFiltrados = produtos.filter(p => {
+        const texto = `${p.nome || ''} ${p.descricao || ''}`.toLowerCase();
+        return kwLower.some(k => texto.includes(k));
+    });
+
+    atualizarChipFiltro();
+    destacarLogoSelecionada(logo);
+    renderizarProdutos(produtosFiltrados);
+}
+
+function limparFiltroProdutos() {
+    filtroSelecionado = null;
+    produtosFiltrados = null;
+    atualizarChipFiltro();
+    destacarLogoSelecionada(null);
+    renderizarProdutos();
+}
+
+function atualizarChipFiltro() {
+    const bar = document.getElementById('produtosFilterBar');
+    if (!bar) return;
+    if (!filtroSelecionado) {
+        bar.classList.remove('show');
+        bar.innerHTML = '';
+        return;
+    }
+    const cor = filtroSelecionado.color || '#00ff00';
+    bar.classList.add('show');
+    bar.innerHTML = `
+        <div class="filter-chip" style="border-color:${cor};">
+            <span>Filtro: ${filtroSelecionado.title}</span>
+            <button type="button" aria-label="Limpar filtro" onclick="limparFiltroProdutos()">×</button>
+        </div>
+    `;
+}
+
+function destacarLogoSelecionada(logo) {
+    document.querySelectorAll('.logos-track .logo-ball').forEach(el => el.classList.remove('active'));
+    if (!logo || !logo.title) return;
+    const title = logo.title;
+    document.querySelectorAll(`.logos-track .logo-ball[data-title="${CSS.escape(title)}"]`).forEach(el => el.classList.add('active'));
+}
+
 // ========== MINI CARROSSEL DE LOGOS/BOLAS ==========
 async function montarLogosCarousel() {
     const track = document.getElementById('logosTrack');
@@ -722,7 +788,13 @@ async function montarLogosCarousel() {
         const div = document.createElement('div');
         div.className = 'logo-ball';
         if (l.variant) div.setAttribute('data-variant', l.variant);
-        if (l.title) div.title = l.title;
+        if (l.title) {
+            div.title = l.title;
+            div.setAttribute('data-title', l.title);
+        }
+        if (l.color) {
+            div.style.setProperty('--ball-color', l.color);
+        }
 
         // Suporta dois formatos: { emoji: '⚽️' } ou { img: 'img/logos/time.png' }
         if (l.img) {
@@ -734,6 +806,8 @@ async function montarLogosCarousel() {
         } else {
             div.textContent = l.emoji || '⚽️';
         }
+        // Clique aplica filtro
+        div.addEventListener('click', () => aplicarFiltroPorLogo(l));
         return div;
     });
 

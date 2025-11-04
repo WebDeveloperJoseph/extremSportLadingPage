@@ -1208,7 +1208,7 @@ footer {
     color: #111;
     font-size: 32px; /* aumenta o tamanho dos ícones/emoji dentro da bolinha */
     box-shadow: 0 6px 20px rgba(0,255,0,0.2), inset 0 0 0 2px rgba(0,0,0,0.05);
-    border: 2px solid rgba(0,255,0,0.25);
+    border: 2px solid var(--ball-color, rgba(0,255,0,0.25));
     flex: 0 0 auto;
 }
 
@@ -1217,7 +1217,7 @@ footer {
 }
 
 .logo-ball[data-variant="ucl"] {
-    border-color: rgba(0, 153, 255, 0.35);
+    border-color: var(--ball-color, rgba(0, 153, 255, 0.35));
 }
 
 .logo-ball img {
@@ -1230,6 +1230,11 @@ footer {
 @keyframes logosScroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
+}
+
+.logo-ball.active {
+    transform: scale(1.08);
+    box-shadow: 0 10px 30px rgba(0,255,0,0.35), inset 0 0 0 2px rgba(0,0,0,0.08);
 }
 
 @media (max-width: 768px) {
@@ -1248,6 +1253,38 @@ footer {
         font-size: 24px;
     }
     .logos-track { gap: 12px; }
+}
+
+/* ========== FILTRO DE PRODUTOS (CHIP) ========== */
+.produtos-filter-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin: -10px 0 20px;
+}
+
+.produtos-filter-bar.show { display: flex; }
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0,255,0,0.1);
+    color: var(--secondary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.filter-chip button {
+    background: var(--secondary-color);
+    color: var(--text-light);
+    border: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 /* Responsivo */
