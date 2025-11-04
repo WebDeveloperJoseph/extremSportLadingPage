@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seed Camisas - Extreme Sport Admin</title>
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link rel="stylesheet" href="styles/seed.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar" id="sidebar">
+            <!-- Injetado via auth-guard.js -->
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <h1>🏆 Seed de Camisas de Times</h1>
+                <p>Cadastra automaticamente produtos usando as imagens em <code>img/camisasTimes/</code></p>
+            </header>
+
+            <div class="seed-container">
+                <div class="seed-info">
+                    <h2>Imagens Detectadas</h2>
+                    <p>Foram encontradas <strong id="countImages">0</strong> camisas prontas para cadastrar.</p>
+                    <p>Revise os dados abaixo e clique em <strong>Cadastrar Todas</strong>.</p>
+                </div>
+
+                <div id="camisasList" class="camisas-list"></div>
+
+                <div class="seed-actions">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="cadastrarTodasCamisas()" id="btnCadastrar">
+                        Cadastrar Todas as Camisas
+                    </button>
+                    <a href="produtos.html" class="btn">Voltar para Produtos</a>
+                </div>
+            </div>
+
+            <div id="logContainer" class="log-container"></div>
+        </main>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+    <script src="scripts/auth-guard.js"></script>
+    <script src="scripts/seed-camisas.js"></script>
+</body>
+</html>
