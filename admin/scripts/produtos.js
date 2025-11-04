@@ -79,14 +79,18 @@ async function carregarProdutos() {
         
         container.innerHTML = `
             <div class="produtos-grid">
-                ${produtos.map(produto => `
+                ${produtos.map(produto => {
+                    const temImagem = Boolean(produto.imagem_url);
+                    const emojiFallback = produto.emoji || '📦';
+                    return `
                     <div class="produto-item">
                         ${produto.destaque ? '<div class="produto-badge-destaque">DESTAQUE</div>' : ''}
                         <div class="produto-item-img">
-                            ${produto.imagem_url 
-                                ? `<img src="${produto.imagem_url}" alt="${produto.nome}" onerror="this.parentElement.innerHTML='<div class=\\"emoji-fallback\\">${produto.emoji || '📦'}</div>'">` 
-                                : `<div class="emoji-fallback">${produto.emoji || '📦'}</div>`
+                            ${temImagem 
+                                ? `<img src="${produto.imagem_url}" alt="${produto.nome}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                                : `<img alt="" style="display:none;">`
                             }
+                            <div class="emoji-fallback" style="${temImagem ? 'display:none;' : 'display:flex;'}">${emojiFallback}</div>
                         </div>
                         <div class="produto-item-info">
                             <h4>${produto.nome}</h4>
@@ -98,8 +102,8 @@ async function carregarProdutos() {
                                 <button class="btn btn-danger btn-sm" onclick="deletarProduto(${produto.id}, '${produto.nome.replace(/'/g, "\\'")}')">Excluir</button>
                             </div>
                         </div>
-                    </div>
-                `).join('')}
+                    </div>`;
+                }).join('')}
             </div>
         `;
         

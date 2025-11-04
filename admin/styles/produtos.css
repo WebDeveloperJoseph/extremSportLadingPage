@@ -161,7 +161,8 @@
 /* Products Grid */
 .produtos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, 260px);
+    justify-content: center; /* centraliza cards fixos */
     gap: 20px;
 }
 
@@ -172,6 +173,7 @@
     padding: 20px;
     transition: all 0.3s ease;
     position: relative;
+    width: 260px; /* largura fixa para tamanhos iguais */
 }
 
 .produto-item:hover {
@@ -277,12 +279,14 @@
     }
     
     .produtos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, 220px);
+        justify-content: center;
         gap: 15px;
     }
 
     .produto-item {
         padding: 15px;
+        width: 220px;
     }
 
     .produto-item-img {
@@ -358,9 +362,8 @@
         gap: 12px;
     }
 
-    .produto-item-img {
-        height: 180px;
-    }
+    .produto-item { width: 100%; }
+    .produto-item-img { height: 180px; }
 
     .image-preview img {
         max-width: 150px;

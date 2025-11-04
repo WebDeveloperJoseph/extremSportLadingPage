@@ -239,8 +239,10 @@ nav a:hover {
 
 .produtos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
+    /* Colunas de largura fixa -> cabem ~3 por linha no desktop padrão */
+    grid-template-columns: repeat(auto-fill, 300px);
+    gap: 1.5rem;
+    justify-content: center; /* centraliza as colunas fixas */
 }
 
 .produto-card {
@@ -251,6 +253,7 @@ nav a:hover {
     transition: transform 0.3s, box-shadow 0.3s, border 0.3s;
     position: relative;
     border: 2px solid transparent;
+    width: 300px; /* largura fixa do card */
 }
 
 .produto-card:hover {
@@ -296,9 +299,14 @@ nav a:hover {
 .produto-img {
     position: relative;
     width: 100%;
-    height: 250px;
+    height: 200px; /* reduz altura da área da imagem */
     background: var(--bg-light);
     overflow: hidden;
+}
+
+/* Compactação para cards com emoji de capacete/skate */
+.produto-img.compacto {
+    height: 160px;
 }
 
 .produto-img img {
@@ -1164,6 +1172,84 @@ footer {
     border-radius: 6px;
 }
 
+/* ========== MINI CARROSSEL DE LOGOS/BOLAS ========== */
+.logos-carousel {
+    background: #0a0a0a;
+    border-top: 1px solid rgba(0,255,0,0.15);
+    border-bottom: 1px solid rgba(0,255,0,0.15);
+    padding: 10px 0;
+    overflow: hidden;
+}
+
+.logos-carousel .container {
+    overflow: hidden;
+}
+
+.logos-track {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    will-change: transform;
+    animation: logosScroll 35s linear infinite;
+}
+
+.logos-carousel:hover .logos-track {
+    animation-play-state: paused;
+}
+
+.logo-ball {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #111;
+    font-size: 32px; /* aumenta o tamanho dos ícones/emoji dentro da bolinha */
+    box-shadow: 0 6px 20px rgba(0,255,0,0.2), inset 0 0 0 2px rgba(0,0,0,0.05);
+    border: 2px solid rgba(0,255,0,0.25);
+    flex: 0 0 auto;
+}
+
+.logo-ball[data-variant="br"] {
+    border-color: rgba(0, 201, 0, 0.35);
+}
+
+.logo-ball[data-variant="ucl"] {
+    border-color: rgba(0, 153, 255, 0.35);
+}
+
+.logo-ball img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+@keyframes logosScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+    .logo-ball {
+        width: 46px;
+        height: 46px;
+        font-size: 26px;
+    }
+    .logos-track { gap: 14px; }
+}
+
+@media (max-width: 480px) {
+    .logo-ball {
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+    }
+    .logos-track { gap: 12px; }
+}
+
 /* Responsivo */
 @media (max-width: 1024px) {
     .hero {
@@ -1171,8 +1257,10 @@ footer {
     }
     
     .produtos-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        grid-template-columns: repeat(auto-fill, 280px);
+        justify-content: center; /* mantém colunas fixas centralizadas no tablet */
     }
+    .produto-card { width: 280px; }
 }
 
 @media (max-width: 768px) {
@@ -1340,16 +1428,21 @@ footer {
     }
 
     .produtos-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 1.5rem;
     }
 
     .produto-card {
         box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        width: 100%;
     }
 
     .produto-img {
-        height: 200px;
+        height: 180px;
+    }
+
+    .produto-img.compacto {
+        height: 150px;
     }
 
     .sobre,
@@ -1469,8 +1562,16 @@ footer {
         gap: 1.25rem;
     }
 
+    .produto-card {
+        width: 100%; /* no mobile, o card ocupa a largura total */
+    }
+
     .produto-img {
         height: 180px;
+    }
+
+    .produto-img.compacto {
+        height: 140px;
     }
 
     .produto-info h3 {

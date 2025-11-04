@@ -45,6 +45,7 @@ async function carregarProdutosDoSupabase() {
 document.addEventListener('DOMContentLoaded', () => {
     carregarProdutosDoSupabase();
     carregarCarrinho();
+    montarLogosCarousel();
 
     // Animação apenas de bounce (removido efeito de giro)
     try {
@@ -66,12 +67,14 @@ function renderizarProdutos() {
         card.className = 'produto-card';
         const temImagem = Boolean(produto.imagem);
         const emojiFallback = produto.emoji || '🏷️';
+        const isHelmetSkate = ['🛹','⛑️','🪖'].includes(emojiFallback);
+        const extraImgClass = isHelmetSkate ? ' compacto' : '';
     const badgeDestaque = produto.destaque ? '<span class="badge-destaque">DESTAQUE</span>' : '';
     const badgeEsgotado = (produto.estoque === 0) ? '<span class="badge-esgotado">ESGOTADO</span>' : '';
         card.innerHTML = `
             ${badgeDestaque}
             ${badgeEsgotado}
-            <div class="produto-img">
+            <div class="produto-img${extraImgClass}">
                 ${temImagem ? `<img src="${produto.imagem}" alt="${produto.nome}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
                 <div class="produto-emoji-fallback" style="${temImagem ? 'display:none;' : 'display:flex;'}">${emojiFallback}</div>
             </div>
@@ -686,4 +689,56 @@ function startAutoplay() {
 function resetAutoplay() {
     clearInterval(carouselInterval);
     startAutoplay();
+}
+
+// ========== MINI CARROSSEL DE LOGOS/BOLAS ==========
+async function montarLogosCarousel() {
+    const track = document.getElementById('logosTrack');
+    if (!track) return;
+
+    // Tenta carregar de um arquivo de configuração editável
+    let logos;
+    try {
+        const resp = await fetch('config/logos-carousel.json', { cache: 'no-cache' });
+        if (!resp.ok) throw new Error('logos-carousel.json não encontrado');
+        logos = await resp.json();
+        if (!Array.isArray(logos)) throw new Error('Formato inválido em logos-carousel.json');
+    } catch (e) {
+        console.warn('Usando lista padrão de logos (não foi possível ler config/logos-carousel.json):', e.message || e);
+        logos = [
+            { variant: 'br', emoji: '⚽️', title: 'Brasil' },
+            { variant: 'ucl', emoji: '⭐', title: 'Champions' },
+            { variant: 'br', emoji: '⚽️', title: 'Brasil' },
+            { variant: 'ucl', emoji: '⭐', title: 'Champions' },
+            { variant: 'br', emoji: '⚽️', title: 'Brasil' },
+            { variant: 'ucl', emoji: '⭐', title: 'Champions' },
+            { variant: 'br', emoji: '⚽️', title: 'Brasil' },
+            { variant: 'ucl', emoji: '⭐', title: 'Champions' }
+        ];
+    }
+
+    // Função para construir um item
+    const buildItems = () => logos.map(l => {
+        const div = document.createElement('div');
+        div.className = 'logo-ball';
+        if (l.variant) div.setAttribute('data-variant', l.variant);
+        if (l.title) div.title = l.title;
+
+        // Suporta dois formatos: { emoji: '⚽️' } ou { img: 'img/logos/time.png' }
+        if (l.img) {
+            const img = document.createElement('img');
+            img.src = l.img;
+            img.alt = l.title || 'logo';
+            img.onerror = () => { img.remove(); div.textContent = l.emoji || '⚽️'; };
+            div.appendChild(img);
+        } else {
+            div.textContent = l.emoji || '⚽️';
+        }
+        return div;
+    });
+
+    // Duplica para rolagem contínua
+    const items1 = buildItems();
+    const items2 = buildItems();
+    items1.concat(items2).forEach(el => track.appendChild(el));
 }
