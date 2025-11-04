@@ -5,39 +5,39 @@ const STORAGE_BUCKET = 'produtos';
 const camisasDisponiveis = [
     {
         arquivo: '1.png',
-        nome: 'Camisa Time 1',
+        nome: 'Camisa Flamengo',
         descricao: 'Camisa oficial de alta qualidade',
         preco: 149.90,
-        keywords: ['time1', 'camisa'],
+        keywords: ['flamengo', 'crf', 'mengão', 'camisa'],
         emoji: '👕',
-        cor: '#00ff00'
+        cor: '#D00000'
     },
     {
         arquivo: '2.png',
-        nome: 'Camisa Time 2',
+        nome: 'Camisa Palmeiras',
         descricao: 'Camisa oficial de alta qualidade',
         preco: 149.90,
-        keywords: ['time2', 'camisa'],
+        keywords: ['palmeiras', 'sep', 'verdão', 'camisa'],
         emoji: '👕',
-        cor: '#0099ff'
+        cor: '#006437'
     },
     {
         arquivo: '3.png',
-        nome: 'Camisa Time 3',
+        nome: 'Camisa Corinthians',
         descricao: 'Camisa oficial de alta qualidade',
         preco: 149.90,
-        keywords: ['time3', 'camisa'],
+        keywords: ['corinthians', 'sccp', 'timão', 'camisa'],
         emoji: '👕',
-        cor: '#ff0000'
+        cor: '#000000'
     },
     {
         arquivo: '4.png',
-        nome: 'Camisa Time 4',
+        nome: 'Camisa São Paulo',
         descricao: 'Camisa oficial de alta qualidade',
         preco: 149.90,
-        keywords: ['time4', 'camisa'],
+        keywords: ['são paulo', 'spfc', 'tricolor', 'camisa'],
         emoji: '👕',
-        cor: '#ffcc00'
+        cor: '#FF0000'
     }
 ];
 
@@ -164,7 +164,7 @@ async function cadastrarTodasCamisas() {
                 .getPublicUrl(fileName);
             
             // 4. Inserir produto com descrição contendo keywords (para filtro funcionar)
-            const descricaoComKeywords = `${descricao} (${keywords.join(', ')})`;
+            const descricaoComKeywords = `${descricao} [Tags: ${keywords.join(', ')}]`;
             
             const produtoData = {
                 nome,

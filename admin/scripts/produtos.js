@@ -1,6 +1,7 @@
 // Gerenciamento de Produtos
 let produtoEditando = null;
 const STORAGE_BUCKET = 'produtos';
+let tagsDisponiveis = [];
 
 // Sistema de notificações Toast
 function showToast(message, type = 'info', title = '') {
@@ -180,12 +181,149 @@ async function diagnosticarProdutos() {
     }
 }
 
+async function carregarTagsDisponiveis() {
+    try {
+        const response = await fetch('../config/logos-carousel.json');
+        const logos = await response.json();
+        
+        // Extrair tags dos logos (title e keywords se houver)
+        tagsDisponiveis = logos.map(logo => {
+            const tags = [logo.title.toLowerCase()];
+            if (logo.keywords && Array.isArray(logo.keywords)) {
+                tags.push(...logo.keywords.map(k => k.toLowerCase()));
+            }
+            return {
+                label: logo.title,
+                value: logo.title.toLowerCase(),
+                keywords: tags
+            };
+        });
+        
+        // Adicionar tags genéricas úteis
+        tagsDisponiveis.push(
+            { label: 'Camisa', value: 'camisa', keywords: ['camisa', 'camiseta'] },
+            { label: 'Boné', value: 'boné', keywords: ['boné', 'bone', 'chapéu'] },
+            { label: 'Capacete', value: 'capacete', keywords: ['capacete', 'helmet'] },
+            { label: 'Skate', value: 'skate', keywords: ['skate', 'skateboard'] },
+            { label: 'Bola', value: 'bola', keywords: ['bola', 'ball'] }
+        );
+        
+        renderizarSeletorTags();
+    } catch (error) {
+        console.error('Erro ao carregar tags:', error);
+        tagsDisponiveis = [
+            { label: 'Camisa', value: 'camisa', keywords: ['camisa', 'camiseta'] },
+            { label: 'Boné', value: 'boné', keywords: ['boné', 'bone'] }
+        ];
+        renderizarSeletorTags();
+    }
+}
+
+function renderizarSeletorTags() {
+    const container = document.getElementById('tagsContainer');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="tags-search">
+            <input type="text" id="tagSearch" placeholder="🔍 Buscar tags..." autocomplete="off">
+        </div>
+        <div class="tags-options" id="tagsOptions">
+            ${tagsDisponiveis.map(tag => `
+                <label class="tag-option">
+                    <input type="checkbox" value="${tag.value}" data-keywords='${JSON.stringify(tag.keywords)}'>
+                    <span class="tag-label">${tag.label}</span>
+                </label>
+            `).join('')}
+        </div>
+        <div class="tags-selected" id="tagsSelecionadas"></div>
+    `;
+    
+    // Event listeners para busca
+    document.getElementById('tagSearch').addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        const options = document.querySelectorAll('.tag-option');
+        
+        options.forEach(option => {
+            const label = option.querySelector('.tag-label').textContent.toLowerCase();
+            option.style.display = label.includes(termo) ? 'flex' : 'none';
+        });
+    });
+    
+    // Event listeners para checkboxes
+    document.querySelectorAll('#tagsOptions input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', atualizarTagsSelecionadas);
+    });
+}
+
+function atualizarTagsSelecionadas() {
+    const checkboxes = document.querySelectorAll('#tagsOptions input[type="checkbox"]:checked');
+    const container = document.getElementById('tagsSelecionadas');
+    
+    if (checkboxes.length === 0) {
+        container.innerHTML = '<p class="tags-empty">Nenhuma tag selecionada</p>';
+        return;
+    }
+    
+    const tags = Array.from(checkboxes).map(cb => {
+        const keywords = JSON.parse(cb.dataset.keywords);
+        return { value: cb.value, keywords };
+    });
+    
+    container.innerHTML = tags.map(tag => `
+        <span class="tag-chip" data-value="${tag.value}">
+            ${tag.value}
+            <button type="button" class="tag-remove" onclick="removerTag('${tag.value}')">×</button>
+        </span>
+    `).join('');
+}
+
+function removerTag(value) {
+    const checkbox = document.querySelector(`#tagsOptions input[value="${value}"]`);
+    if (checkbox) {
+        checkbox.checked = false;
+        atualizarTagsSelecionadas();
+    }
+}
+
+function getTagsSelecionadas() {
+    const checkboxes = document.querySelectorAll('#tagsOptions input[type="checkbox"]:checked');
+    const allKeywords = [];
+    
+    checkboxes.forEach(cb => {
+        const keywords = JSON.parse(cb.dataset.keywords);
+        allKeywords.push(...keywords);
+    });
+    
+    // Remover duplicatas e retornar como string para salvar na descrição
+    return [...new Set(allKeywords)].join(', ');
+}
+
+function preencherTagsNoFormulario(descricao) {
+    if (!descricao) return;
+    
+    const descricaoLower = descricao.toLowerCase();
+    
+    // Marcar checkboxes das tags que estão na descrição
+    document.querySelectorAll('#tagsOptions input[type="checkbox"]').forEach(checkbox => {
+        const keywords = JSON.parse(checkbox.dataset.keywords);
+        const temKeyword = keywords.some(kw => descricaoLower.includes(kw));
+        checkbox.checked = temKeyword;
+    });
+    
+    atualizarTagsSelecionadas();
+}
+
 function abrirModalProduto() {
     produtoEditando = null;
     document.getElementById('modalTitle').textContent = 'Novo Produto';
     document.getElementById('formProduto').reset();
     document.getElementById('produtoId').value = '';
     document.getElementById('imagemPreview').classList.remove('show');
+    
+    // Limpar tags selecionadas
+    document.querySelectorAll('#tagsOptions input[type="checkbox"]').forEach(cb => cb.checked = false);
+    atualizarTagsSelecionadas();
+    
     document.getElementById('modalProduto').classList.add('active');
     document.getElementById('modalOverlay').classList.add('active');
 }
@@ -219,6 +357,9 @@ async function editarProduto(id) {
         document.getElementById('estoque').value = produto.estoque ?? 0;
         document.getElementById('emoji').value = produto.emoji || '';
         document.getElementById('destaque').checked = produto.destaque || false;
+        
+        // Preencher tags baseado na descrição
+        preencherTagsNoFormulario(produto.descricao);
         
         // Mostrar preview da imagem atual
         if (produto.imagem_url) {
@@ -315,12 +456,18 @@ document.getElementById('formProduto').addEventListener('submit', async (e) => {
     try {
         const id = document.getElementById('produtoId').value;
         const nome = document.getElementById('nome').value.trim();
-        const descricao = document.getElementById('descricao').value.trim();
+        const descricaoBase = document.getElementById('descricao').value.trim();
         const preco = parseFloat(document.getElementById('preco').value);
         const emoji = document.getElementById('emoji').value.trim();
         const estoque = parseInt(document.getElementById('estoque').value, 10);
         const destaque = document.getElementById('destaque').checked;
         const imagemFile = document.getElementById('imagemFile').files[0];
+        
+        // Obter tags selecionadas e adicionar à descrição
+        const tagsSelecionadas = getTagsSelecionadas();
+        const descricao = tagsSelecionadas 
+            ? `${descricaoBase} [Tags: ${tagsSelecionadas}]`
+            : descricaoBase;
         
         // Validações
         if (isNaN(estoque) || estoque < 0) {
@@ -403,5 +550,8 @@ document.getElementById('formProduto').addEventListener('submit', async (e) => {
     }
 });
 
-// Carregar produtos ao iniciar
-document.addEventListener('DOMContentLoaded', carregarProdutos);
+// Carregar produtos e tags ao iniciar
+document.addEventListener('DOMContentLoaded', () => {
+    carregarTagsDisponiveis();
+    carregarProdutos();
+});

@@ -10,6 +10,13 @@ let carrinho = [];
 let currentSlide = 0;
 let carouselInterval;
 
+// Função para limpar tags da descrição antes de exibir
+function limparDescricao(descricao) {
+    if (!descricao) return '';
+    // Remove a parte "[Tags: ...]" da descrição
+    return descricao.replace(/\s*\[Tags:.*?\]\s*/gi, '').trim();
+}
+
 // Carregar produtos do Supabase
 async function carregarProdutosDoSupabase() {
     try {
@@ -89,7 +96,7 @@ function renderizarProdutos(lista = null) {
             </div>
             <div class="produto-info">
                 <h3>${produto.nome}</h3>
-                <p>${produto.descricao}</p>
+                <p>${limparDescricao(produto.descricao)}</p>
                 <div class="produto-price">R$ ${produto.preco.toFixed(2).replace('.', ',')}</div>
                 <button class="add-to-cart" onclick="adicionarAoCarrinho(${produto.id})" ${produto.estoque === 0 ? 'disabled' : ''}>
                     Adicionar ao Carrinho
@@ -629,7 +636,7 @@ function iniciarCarrossel() {
                 </div>
                 <div class="carousel-info">
                     <h3>${produto.nome}</h3>
-                    <p>${produto.descricao}</p>
+                    <p>${limparDescricao(produto.descricao)}</p>
                     <div class="carousel-price">R$ ${produto.preco.toFixed(2).replace('.', ',')}</div>
                     <button class="carousel-add-btn" onclick="adicionarAoCarrinho(${produto.id})">
                         Adicionar ao Carrinho
