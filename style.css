@@ -1185,6 +1185,15 @@ footer {
     overflow: hidden;
 }
 
+.filtro_times {
+    font-family: 'roboto' sans-serif;
+    font-weight: 400;
+    font-size: medium;
+    background-color: var(--bg-dark);
+    color: var(--primary-color);
+    text-align: center;
+}
+
 .logos-track {
     display: flex;
     align-items: center;
@@ -1235,6 +1244,34 @@ footer {
 .logo-ball.active {
     transform: scale(1.08);
     box-shadow: 0 10px 30px rgba(0,255,0,0.35), inset 0 0 0 2px rgba(0,0,0,0.08);
+    position: relative;
+}
+
+/* Botão X para remover filtro */
+.remove-filter-btn {
+    position: absolute;
+    top: 2px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    background: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.remove-filter-btn:hover {
+    background: #ff4444;
+    transform: scale(1.1);
 }
 
 @media (max-width: 768px) {

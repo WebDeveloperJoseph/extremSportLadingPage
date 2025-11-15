@@ -219,6 +219,26 @@ async function abrirDetalhesPedido(id) {
                     <button class="btn btn-danger" onclick="atualizarStatus('cancelado')" ${pedido.status === 'cancelado' ? 'disabled' : ''}>Cancelar</button>
                 </div>
             </div>
+            
+            <div class="danger-zone">
+                <h4>⚠️ Zona Perigosa</h4>
+                <div class="warning-box">
+                    <div class="warning-icon">🚨</div>
+                    <div class="warning-content">
+                        <strong>ATENÇÃO:</strong> A exclusão de um pedido é uma ação irreversível que pode afetar:
+                        <ul>
+                            <li>Relatórios financeiros e estatísticas</li>
+                            <li>Histórico do cliente</li>
+                            <li>Auditoria e controle fiscal</li>
+                            <li>Estoque dos produtos (não será restaurado automaticamente)</li>
+                        </ul>
+                        <p><strong>Use apenas para pedidos de teste ou casos específicos.</strong></p>
+                    </div>
+                </div>
+                <button class="btn btn-danger btn-delete" onclick="confirmarExclusaoPedido()" id="btnExcluirPedido">
+                    🗑️ Excluir Pedido Permanentemente
+                </button>
+            </div>
         `;
         
         document.getElementById('modalPedido').classList.add('active');
@@ -325,6 +345,10 @@ function formatarPagamento(tipo) {
 // Carregar pedidos ao iniciar
 document.addEventListener('DOMContentLoaded', carregarPedidos);
 
+// Teste: tornar função global para debug
+window.confirmarExclusaoPedido = confirmarExclusaoPedido;
+window.excluirPedidoPermanentemente = excluirPedidoPermanentemente;
+
 // Diagnóstico similar ao de produtos
 async function diagnosticarPedidos() {
     try {
@@ -423,5 +447,132 @@ async function criarPedidoTeste() {
     } catch (e) {
         console.error('Erro ao criar pedido teste:', e);
         showToast(e.message || 'Erro ao criar pedido de teste', 'error');
+    }
+}
+
+// Confirmar exclusão com aviso duplo
+function confirmarExclusaoPedido() {
+    console.log('confirmarExclusaoPedido chamada, pedidoAtual:', pedidoAtual);
+    
+    if (!pedidoAtual) {
+        showToast('Nenhum pedido selecionado', 'error');
+        console.error('Nenhum pedido selecionado');
+        return;
+    }
+    
+    console.log('Iniciando processo de exclusão para pedido:', pedidoAtual.id);
+
+    // Primeiro aviso
+    const primeiraConfirmacao = confirm(
+        `⚠️ ATENÇÃO: Você está prestes a EXCLUIR PERMANENTEMENTE o pedido #${pedidoAtual.id}.\n\n` +
+        `Cliente: ${pedidoAtual.cliente_nome}\n` +
+        `Total: R$ ${parseFloat(pedidoAtual.total).toFixed(2).replace('.', ',')}\n` +
+        `Status: ${pedidoAtual.status}\n\n` +
+        `Esta ação é IRREVERSÍVEL e pode afetar relatórios, histórico e auditoria.\n\n` +
+        `Tem certeza que deseja continuar?`
+    );
+
+    if (!primeiraConfirmacao) {
+        showToast('Exclusão cancelada pelo usuário', 'info');
+        return;
+    }
+
+    // Segundo aviso mais específico
+    const segundaConfirmacao = confirm(
+        `🚨 CONFIRMAÇÃO FINAL 🚨\n\n` +
+        `Digite "EXCLUIR" na próxima tela para confirmar a exclusão permanente do pedido #${pedidoAtual.id}.\n\n` +
+        `⚠️ LEMBRE-SE:\n` +
+        `• Esta ação não pode ser desfeita\n` +
+        `• O estoque NÃO será restaurado automaticamente\n` +
+        `• Dados serão perdidos para sempre\n\n` +
+        `Clique OK para continuar com a confirmação por texto.`
+    );
+
+    if (!segundaConfirmacao) {
+        showToast('Exclusão cancelada pelo usuário', 'info');
+        return;
+    }
+
+    // Confirmação por texto
+    const textoConfirmacao = prompt(
+        `Para confirmar a exclusão permanente do pedido #${pedidoAtual.id}, digite exatamente:\n\nEXCLUIR`
+    );
+
+    if (textoConfirmacao !== 'EXCLUIR') {
+        showToast('Texto de confirmação incorreto. Exclusão cancelada.', 'warning');
+        return;
+    }
+
+    // Proceder com a exclusão
+    excluirPedidoPermanentemente();
+}
+
+// Executar exclusão do pedido
+async function excluirPedidoPermanentemente() {
+    if (!pedidoAtual) {
+        showToast('Erro: pedido não encontrado', 'error');
+        return;
+    }
+
+    const pedidoId = pedidoAtual.id;
+    const clienteNome = pedidoAtual.cliente_nome;
+
+    try {
+        showToast(`Excluindo pedido #${pedidoId}...`, 'info');
+
+        // Primeiro, verificar se o pedido ainda existe
+        const { data: verificacao, error: errVerif } = await supabase
+            .from('pedidos')
+            .select('id')
+            .eq('id', pedidoId)
+            .single();
+
+        if (errVerif && errVerif.code !== 'PGRST116') { // PGRST116 = not found (ok se não achar)
+            console.error('Erro ao verificar pedido:', errVerif);
+            throw new Error(`Não foi possível verificar o pedido: ${errVerif.message}`);
+        }
+
+        if (!verificacao) {
+            throw new Error('Pedido não encontrado no banco de dados');
+        }
+
+        // Tentar exclusão
+        const { data: resultado, error } = await supabase
+            .from('pedidos')
+            .delete()
+            .eq('id', pedidoId)
+            .select(); // Retorna os dados excluídos para confirmação
+
+        if (error) {
+            console.error('Erro detalhado na exclusão:', error);
+            
+            if (error.code === '42501' || error.message.includes('permission')) {
+                throw new Error('Permissão negada. Execute o script fix-pedidos-policies.sql no Supabase para corrigir as políticas RLS.');
+            } else if (error.code === '23503') {
+                throw new Error('Não é possível excluir: existem registros relacionados. Remova dependências primeiro.');
+            } else {
+                throw new Error(`Erro no banco: ${error.message} (Código: ${error.code || 'N/A'})`);
+            }
+        }
+
+        if (!resultado || resultado.length === 0) {
+            throw new Error('Nenhum pedido foi excluído. Verifique as permissões RLS.');
+        }
+
+        showToast(`Pedido #${pedidoId} (${clienteNome}) foi excluído permanentemente`, 'success');
+        
+        // Fechar modal e recarregar lista
+        fecharModalPedido();
+        carregarPedidos();
+
+        // Log adicional para auditoria
+        console.warn(`PEDIDO EXCLUÍDO - ID: ${pedidoId}, Cliente: ${clienteNome}, Timestamp: ${new Date().toISOString()}`);
+
+    } catch (error) {
+        console.error('Erro ao excluir pedido:', error);
+        showToast(
+            `Falha na exclusão: ${error.message}`, 
+            'error'
+        );
     }
 }

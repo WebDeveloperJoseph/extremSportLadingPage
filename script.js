@@ -729,6 +729,9 @@ function aplicarFiltroPorLogo(logo) {
     atualizarChipFiltro();
     destacarLogoSelecionada(logo);
     renderizarProdutos(produtosFiltrados);
+    
+    // Scroll automático para a seção de produtos
+    scrollParaProdutos();
 }
 
 function limparFiltroProdutos() {
@@ -758,10 +761,67 @@ function atualizarChipFiltro() {
 }
 
 function destacarLogoSelecionada(logo) {
-    document.querySelectorAll('.logos-track .logo-ball').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.logos-track .logo-ball').forEach(el => {
+        el.classList.remove('active');
+        // Remover botão X se existir
+        const xBtn = el.querySelector('.remove-filter-btn');
+        if (xBtn) xBtn.remove();
+    });
+    
     if (!logo || !logo.title) return;
+    
     const title = logo.title;
-    document.querySelectorAll(`.logos-track .logo-ball[data-title="${CSS.escape(title)}"]`).forEach(el => el.classList.add('active'));
+    document.querySelectorAll(`.logos-track .logo-ball[data-title="${CSS.escape(title)}"]`).forEach(el => {
+        el.classList.add('active');
+        
+        // Adicionar botão X para remover filtro
+        if (!el.querySelector('.remove-filter-btn')) {
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-filter-btn';
+            removeBtn.innerHTML = '×';
+            removeBtn.title = 'Remover filtro';
+            removeBtn.setAttribute('aria-label', 'Remover filtro');
+            removeBtn.setAttribute('tabindex', '0');
+            
+            const removerFiltro = (e) => {
+                e.stopPropagation();
+                limparFiltroProdutos();
+            };
+            
+            removeBtn.addEventListener('click', removerFiltro);
+            removeBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    removerFiltro(e);
+                }
+            });
+            
+            el.appendChild(removeBtn);
+        }
+    });
+}
+
+function scrollParaProdutos() {
+    const produtosSection = document.getElementById('produtos');
+    if (produtosSection) {
+        // Calcula offset para compensar header fixo
+        const headerHeight = document.querySelector('header')?.offsetHeight || 80;
+        const elementPosition = produtosSection.offsetTop - headerHeight - 20; // 20px de margem extra
+        
+        window.scrollTo({
+            top: elementPosition,
+            behavior: 'smooth'
+        });
+    } else {
+        // Fallback: scroll para o grid de produtos
+        const grid = document.getElementById('produtosGrid');
+        if (grid) {
+            grid.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    }
 }
 
 // ========== MINI CARROSSEL DE LOGOS/BOLAS ==========
