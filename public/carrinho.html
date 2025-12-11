@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Carrinho - Pretinho Variedades</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="carrinho.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- HEADER FIXO -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">Pretinho Variedades</div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="#categorias">Categorias</a></li>
+                    <li><a href="#ofertas">Ofertas</a></li>
+                    <li><a href="#contato">Contato</a></li>
+                </ul>
+            </nav>
+            <div class="search-box">
+                <input type="search" placeholder="Buscar produtos...">
+                <button type="button">🔍</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- PÁGINA DO CARRINHO -->
+    <main class="cart-page">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="index.html">Início</a> / <span>Carrinho de Compras</span>
+            </div>
+
+            <h1 class="page-title">🛒 Meu Carrinho de Compras</h1>
+
+            <div class="cart-layout">
+                <!-- ÁREA PRINCIPAL - PRODUTOS NO CARRINHO -->
+                <section class="cart-items-section">
+                    <!-- Itens do carrinho serão renderizados dinamicamente pelo JS -->
+                </section>
+
+                <!-- ÁREA LATERAL - RESUMO DO PEDIDO -->
+                <aside class="cart-summary">
+                    <h2 class="summary-title">Resumo do Pedido</h2>
+
+                    <div class="summary-content">
+                        <!-- Fluxo B2B: Empresa (CNPJ) -->
+                        <div class="b2b-section">
+                            <div class="b2b-header">
+                                <label class="b2b-toggle-label">
+                                    <input type="checkbox" id="b2b-toggle" class="b2b-checkbox">
+                                    <span class="b2b-toggle-text">🏢 Sou Empresa (CNPJ)</span>
+                                </label>
+                            </div>
+                            <div id="b2b-fields" class="b2b-fields">
+                                <div class="b2b-form-group">
+                                    <label for="b2b-cnpj">CNPJ</label>
+                                    <input type="text" id="b2b-cnpj" placeholder="00.000.000/0000-00" class="b2b-input">
+                                </div>
+                                <div class="b2b-form-group">
+                                    <label for="b2b-razao">Razão Social</label>
+                                    <input type="text" id="b2b-razao" placeholder="Nome da Empresa" class="b2b-input">
+                                </div>
+                                <div class="b2b-form-row">
+                                    <div class="b2b-form-group">
+                                        <label for="b2b-email">E-mail</label>
+                                        <input type="email" id="b2b-email" placeholder="contato@empresa.com" class="b2b-input">
+                                    </div>
+                                    <div class="b2b-form-group">
+                                        <label for="b2b-phone">Telefone</label>
+                                        <input type="text" id="b2b-phone" placeholder="(00) 00000-0000" class="b2b-input">
+                                    </div>
+                                </div>
+                                <div class="b2b-form-group">
+                                    <label for="b2b-notes">Observações</label>
+                                    <textarea id="b2b-notes" rows="3" placeholder="Prazo desejado, condições, etc." class="b2b-textarea"></textarea>
+                                </div>
+                                <button id="btn-b2b-quote" class="btn-b2b-quote">📋 Solicitar Orçamento B2B</button>
+                                <div id="b2b-result" class="b2b-result">
+                                    <div id="b2b-result-msg"></div>
+                                    <div id="b2b-export-links"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cupom de Desconto -->
+                        <div class="coupon-section">
+                            <label for="coupon-input">Cupom de Desconto</label>
+                            <div class="coupon-input-group">
+                                <input type="text" id="coupon-input" placeholder="Digite seu cupom">
+                                <button class="btn-apply-coupon">Aplicar</button>
+                            </div>
+                        </div>
+
+                        <!-- Detalhes do Resumo -->
+                        <div class="summary-details">
+                            <div class="summary-row">
+                                <span class="label">Subtotal dos Produtos:</span>
+                                <span class="value">R$ 0,00</span>
+                            </div>
+                            <div class="summary-row discount-row" style="display: none;">
+                                <span class="label">Desconto (Cupom):</span>
+                                <span class="value discount">- R$ 0,00</span>
+                            </div>
+                            <hr class="summary-divider">
+                            <div class="summary-row total-row">
+                                <span class="label">Total:</span>
+                                <span class="value total">R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        <!-- Botão Finalizar Compra -->
+                        <button class="btn-checkout">Finalizar Compra</button>
+                        
+                        <!-- Selos de Segurança -->
+                        <div class="security-badges">
+                            <p>🔒 Compra 100% Segura</p>
+                            <p>📦 Entrega Garantida</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Pretinho Variedades</h4>
+                    <p>Sua loja de materiais escolares com os melhores preços!</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Atendimento</h4>
+                    <p>Segunda a Sexta: 8h - 18h</p>
+                    <p>Sábado: 8h - 12h</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p>📞 (83) 99851-1065</p>
+                    <p>📈 Rua 6 de Julho (Perto da Feira Livre de Nova Floresta)</p>
+                    <p>📱 <a href="https://www.instagram.com/pretinhovariedades/" target="_blank">Instagram: @pretinhovariedades</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Pretinho Variedades. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/notifications.js"></script>
+    <script src="../admin/js/admin-shipping.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+</html>

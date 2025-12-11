@@ -1,0 +1,184 @@
+🎬 SISTEMA DE BANNERS - GUIA COMPLETO ✨
+
+═══════════════════════════════════════════════════════════════════════════
+
+📌 FUNCIONALIDADES IMPLEMENTADAS:
+
+✅ UPLOAD DE FOTOS
+   • Duplo clique no campo de imagem para fazer upload
+   • Suporta: JPG, PNG, GIF, WebP
+   • Upload automático para servidor (pasta /uploads)
+   • Preview em tempo real
+
+✅ EDITOR AVANÇADO
+   • Painel de edição com campos:
+     - Imagem (URL ou upload)
+     - Título (obrigatório)
+     - Subtítulo (opcional)
+     - Link (âncora ou URL externo)
+     - Ordem (prioridade de exibição)
+     - Status (Ativo/Inativo)
+
+✅ PREVIEW EM TEMPO REAL
+   • Visualiza o banner enquanto edita
+   • Mostra informações do banner
+   • Exibe texto sobreposto e botão CTA
+
+✅ GERENCIAMENTO DE BANNERS
+   • Lista todos os banners cadastrados
+   • Editar/Excluir banners
+   • Ordenar por prioridade
+   • Ativar/Desativar banners
+
+✅ SINCRONIZAÇÃO COM SITE PÚBLICO 🔄
+   • Ao SALVAR um banner → atualiza no site público
+   • Ao EXCLUIR um banner → remove do site público
+   • Atualização em tempo real (< 1 segundo)
+   • Funciona em abas diferentes do navegador
+   • Fallback periódico a cada 5 segundos
+
+═══════════════════════════════════════════════════════════════════════════
+
+🚀 COMO USAR:
+
+1️⃣ ACESSAR O PAINEL
+   URL: http://localhost:3333/admin/banners-avancado.html
+   ou: http://127.0.0.1:5500/admin/banners-avancado.html (Live Server)
+
+2️⃣ CRIAR UM NOVO BANNER
+   a) Clique em "➕ Novo" para limpar o formulário
+   b) Adicione a imagem (duas opções):
+      • Duplo clique no campo → selecione arquivo do seu PC
+      • Ou copie URL de uma imagem online
+   c) Preencha o título (obrigatório)
+   d) Preencha o subtítulo (opcional)
+   e) Adicione um link (opcional):
+      • Link interno: #ofertas, #categorias, #contato
+      • Link externo: https://www.example.com
+   f) Defina a ordem (1 = primeiro)
+   g) Marque se quer ativar agora
+   h) Clique em "💾 Salvar"
+
+3️⃣ EDITAR UM BANNER EXISTENTE
+   a) Clique no banner na lista de "Seus Banners"
+   b) Edite os campos que desejar
+   c) Clique em "💾 Salvar"
+
+4️⃣ EXCLUIR UM BANNER
+   a) Clique em "Excluir" no banner da lista
+   b) Confirme a exclusão
+   c) Banner será removido do site automaticamente
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔄 SINCRONIZAÇÃO AUTOMÁTICA:
+
+Quando você SALVA ou DELETA um banner:
+   1. Status muda para "🔄 Sincronizando..." (amarelo)
+   2. Configurações são enviadas para a API
+   3. Evento de sincronização é disparado
+   4. Site público detecta a mudança
+   5. Banners do home são atualizados em tempo real
+   6. Status muda para "✅ Banner salvo e sincronizado!" (verde)
+
+Se você estiver com o site público aberto:
+   • Você verá os banners aparecerem/desaparecerem automaticamente
+   • Não precisa recarregar a página!
+   • Funciona mesmo em abas diferentes
+
+═══════════════════════════════════════════════════════════════════════════
+
+💡 DICAS PRÁTICAS:
+
+✨ IMAGENS PERFEITAS:
+   • Tamanho ideal: 1920x600px (16:5)
+   • Formato: JPG comprimido (< 500KB)
+   • Certifique-se que a imagem cobre toda a largura
+
+🎨 TEXTOS EFETIVOS:
+   • Título: Máximo 30 caracteres
+   • Subtítulo: Máximo 60 caracteres
+   • Use chamadas à ação claras
+
+🔗 LINKS ÚTEIS:
+   • #ofertas → vai para seção de ofertas
+   • #categorias → vai para categorias
+   • #contato → vai para rodapé/contato
+   • produtos.html?category=mochilas → vai para produtos filtrados
+
+⏱️ ORDEM E PRIORIDADE:
+   • Número 1 = primeiro banner exibido
+   • Banners com números menores aparecem primeiro
+   • No carrossel, avança automaticamente a cada 5 segundos
+
+✔️ ATIVAR/DESATIVAR:
+   • Ativo: banner aparece no site público
+   • Inativo: banner fica oculto (útil para banners sazonais)
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 STATUS DE SINCRONIZAÇÃO:
+
+🟢 Verde (Success):     ✅ Operação concluída com sucesso
+🔴 Vermelho (Error):    ❌ Erro na operação
+🟠 Laranja (Syncing):   🔄 Sincronizando com o site...
+🔵 Azul (Info):         ℹ️ Informação geral
+
+A notificação aparece no canto superior direito da tela.
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔧 COMO FUNCIONA INTERNAMENTE:
+
+1. Admin edita banner → API recebe dados
+2. API salva no banco de dados
+3. Admin dispara evento localStorage ('bannersChanged': true)
+4. Site público detecta o evento
+5. Site público faz fetch dos banners atualizados
+6. DOM do site é atualizado dinamicamente
+7. Tudo sem precisar recarregar!
+
+═══════════════════════════════════════════════════════════════════════════
+
+❓ TROUBLESHOOTING:
+
+PROBLEMA: Banner não aparece no site público
+SOLUÇÃO:
+   1. Verifique se está marcado como "Ativo"
+   2. Recarregue a página (F5)
+   3. Verifique o console para erros (F12)
+
+PROBLEMA: Upload não funciona
+SOLUÇÃO:
+   1. Verifique se o servidor está rodando
+   2. Certificar arquivo está no formato correto (JPG/PNG)
+   3. Verificar tamanho do arquivo (< 5MB)
+
+PROBLEMA: Sincronização não funciona
+SOLUÇÃO:
+   1. Verifique se localStorage está habilitado
+   2. Recarregue ambas as abas (admin e site público)
+   3. Tente fazer upload novamente
+
+═══════════════════════════════════════════════════════════════════════════
+
+📱 RESPONSIVIDADE:
+
+✅ Desktop (>1200px):    Carrossel completo de banners
+✅ Tablet (768-1200px):  Banners adaptados
+✅ Mobile (<768px):      Banners em tela cheia
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎯 PRÓXIMOS PASSOS (Opcional):
+
+• Adicionar agendamento de banners (data início/fim)
+• Análise de cliques em banners
+• Testes A/B de diferentes banners
+• Banners por dispositivo (móvel/desktop diferentes)
+
+═══════════════════════════════════════════════════════════════════════════
+
+✨ Pronto para usar! Adicione seus primeiros banners agora! 🎉
+
+═══════════════════════════════════════════════════════════════════════════

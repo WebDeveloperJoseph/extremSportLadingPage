@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Debug Admin Produtos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+        }
+        h1 { color: #667eea; margin-bottom: 30px; }
+        .log-box {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .log-line { margin-bottom: 8px; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        .info { color: #3b82f6; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .status.ok {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border: 2px solid #ef4444;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug - Admin Produtos</h1>
+        
+        <div class="log-box" id="log"></div>
+        
+        <div id="status"></div>
+        
+        <button onclick="testApiConnection()">🌐 Testar Conexão API</button>
+        <button onclick="testLoadProducts()">📦 Testar Carregamento</button>
+        <button onclick="showProducts()">📋 Ver Produtos</button>
+        <button onclick="clearLog()">🗑️ Limpar Log</button>
+        
+        <div id="products"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3333';
+        let products = [];
+        
+        function log(message, type = 'info') {
+            const logBox = document.getElementById('log');
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            line.textContent = `[${timestamp}] ${message}`;
+            logBox.appendChild(line);
+            logBox.scrollTop = logBox.scrollHeight;
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('Log limpo');
+        }
+        
+        async function testApiConnection() {
+            log('🔌 Testando conexão com API...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                log(`📡 Status: ${response.status}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log('✅ Servidor respondendo!', 'success');
+                    log(`Status: ${data.status}`, 'success');
+                    
+                    document.getElementById('status').innerHTML = `
+                        <div class="status ok">
+                            ✅ Servidor está ONLINE em ${API_BASE}
+                        </div>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (e) {
+                log(`❌ Erro: ${e.message}`, 'error');
+                document.getElementById('status').innerHTML = `
+                    <div class="status error">
+                        ❌ Não conseguiu conectar em ${API_BASE}
+                    </div>
+                `;
+            }
+        }
+        
+        async function testLoadProducts() {
+            log('📦 Tentando carregar produtos da API...', 'info');
+            log(`🔌 URL: ${API_BASE}/api/products`, 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/products`);
+                log(`📡 Status: ${response.status}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                products = await response.json();
+                log(`✅ ${products.length} produto(s) carregado(s)!`, 'success');
+                
+                if (products.length === 0) {
+                    log('⚠️ Nenhum produto encontrado na API', 'warning');
+                } else {
+                    products.forEach(p => {
+                        log(`  • ${p.name} (ID: ${p.id}) - R$ ${p.priceCurrent}`, 'success');
+                    });
+                }
+                
+                document.getElementById('status').innerHTML = `
+                    <div class="status ok">
+                        ✅ API carregou ${products.length} produto(s)
+                    </div>
+                `;
+                
+            } catch (e) {
+                log(`❌ Erro: ${e.message}`, 'error');
+                document.getElementById('status').innerHTML = `
+                    <div class="status error">
+                        ❌ Erro ao carregar produtos: ${e.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function showProducts() {
+            if (products.length === 0) {
+                log('⚠️ Nenhum produto carregado. Execute "Testar Carregamento" primeiro.', 'warning');
+                return;
+            }
+            
+            let html = `
+                <h2 style="margin-top: 40px; color: #333;">📦 Produtos (${products.length})</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Preço</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            products.forEach(p => {
+                html += `
+                    <tr>
+                        <td>#${p.id}</td>
+                        <td>${p.name}</td>
+                        <td>${p.category}</td>
+                        <td>R$ ${p.priceCurrent.toFixed(2)}</td>
+                        <td>${p.active ? '✅ Ativo' : '❌ Inativo'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `</tbody></table>`;
+            document.getElementById('products').innerHTML = html;
+            
+            log(`✅ Tabela exibida com ${products.length} produto(s)`, 'success');
+        }
+        
+        // Inicializar
+        log('🚀 Página de debug carregada', 'success');
+        log(`API configurada: ${API_BASE}`, 'info');
+    </script>
+</body>
+</html>

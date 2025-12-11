@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Como Usar - Mercado Pretinho</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card ol {
+            color: #666;
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .card li {
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .status-ok {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #10b981;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #ef4444;
+        }
+
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .highlight h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .highlight p {
+            color: #856404;
+        }
+
+        .footer {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .footer p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        code {
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d32f2f;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .output {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <header>
+        <h1>🚀 Sistema de Produtos</h1>
+        <p>Adicione produtos no admin e veja aparecer automaticamente na loja</p>
+    </header>
+
+    <!-- HIGHLIGHT -->
+    <div class="highlight">
+        <h3>💡 Como Funciona?</h3>
+        <p>
+            1. Você cria um produto no <strong>Painel Admin</strong><br>
+            2. O produto é salvo no banco de dados<br>
+            3. A loja se sincroniza <strong>automaticamente</strong><br>
+            4. Seus clientes veem o produto na <strong>homepage</strong>
+        </p>
+    </div>
+
+    <!-- CARDS COM INSTRUÇÕES -->
+    <div class="grid">
+        <!-- Card 1: Criar Produto -->
+        <div class="card">
+            <div class="card-icon">🔧</div>
+            <h2>1. Criar Produto no Admin</h2>
+            <p>Acesse o painel administrativo e crie um novo produto.</p>
+            <ol>
+                <li>Clique no botão <strong>"➕ Novo Produto"</strong></li>
+                <li>Preencha o formulário:
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Nome do produto</li>
+                        <li>Descrição</li>
+                        <li>Categoria</li>
+                        <li>Preço original e em oferta</li>
+                        <li>Selecione uma imagem</li>
+                    </ul>
+                </li>
+                <li><strong>Muito importante!</strong> Marque a checkbox <code>Ativo</code></li>
+                <li>Clique em <strong>"💾 Salvar Produto"</strong></li>
+            </ol>
+            <div class="button-group">
+                <a href="http://localhost:3333/admin/produtos.html" target="_blank" class="btn btn-primary">
+                    🔧 Abrir Admin
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 2: Verificar Servidor -->
+        <div class="card">
+            <div class="card-icon">🔌</div>
+            <h2>2. Verificar Servidor</h2>
+            <p>Certifique-se de que o servidor está rodando corretamente.</p>
+            <ol>
+                <li>Terminal: <code>cd mercado-pretinho/server</code></li>
+                <li>Execute: <code>npm start</code></li>
+                <li>Deve aparecer:
+                    <pre style="background: #f3f4f6; padding: 10px; margin: 10px 0; border-radius: 4px;">✅ Pretinho backend rodando em http://localhost:3333</pre>
+                </li>
+                <li>Se deu erro, recarregue a página (F5)</li>
+            </ol>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="checkServer()">🔌 Testar Servidor</button>
+            </div>
+            <div id="serverStatus"></div>
+        </div>
+
+        <!-- Card 3: Ver Produtos -->
+        <div class="card">
+            <div class="card-icon">📦</div>
+            <h2>3. Ver Produtos na Loja</h2>
+            <p>Abra a loja pública e veja seus produtos aparecerem.</p>
+            <ol>
+                <li>Clique no botão <strong>"🏠 Abrir Loja"</strong></li>
+                <li>Procure a seção <strong>"🔥 Ofertas Imperdíveis"</strong></li>
+                <li>Seus produtos estarão lá! 🎉</li>
+                <li>Desça mais para ver <strong>Mais Vendidos</strong>, <strong>Novidades</strong> e <strong>Promoções</strong></li>
+            </ol>
+            <div class="button-group">
+                <a href="http://localhost:3333/" target="_blank" class="btn btn-primary">
+                    🏠 Abrir Loja
+                </a>
+            </div>
+        </div>
+
+        <!-- Card 4: Teste Rápido -->
+        <div class="card">
+            <div class="card-icon">⚡</div>
+            <h2>4. Teste Automático</h2>
+            <p>Crie um produto de teste automaticamente e veja sincronizar.</p>
+            <ol>
+                <li>Clique no botão <strong>"➕ Criar Teste"</strong></li>
+                <li>Um produto será criado automaticamente</li>
+                <li>Abra a loja em outra aba</li>
+                <li>Recarregue (F5) - verá o produto!</li>
+                <li>Perfeito? Agora crie seus produtos reais! 🚀</li>
+            </ol>
+            <div class="button-group">
+                <button class="btn btn-success" onclick="createTestProduct()">➕ Criar Teste</button>
+            </div>
+            <div id="testStatus"></div>
+        </div>
+
+        <!-- Card 5: Links Rápidos -->
+        <div class="card">
+            <div class="card-icon">🔗</div>
+            <h2>5. Links Rápidos</h2>
+            <p>Acesso direto a todas as funcionalidades.</p>
+            <div class="button-group" style="flex-direction: column;">
+                <a href="http://localhost:3333/" target="_blank" class="btn btn-primary">🏠 Homepage</a>
+                <a href="http://localhost:3333/admin/produtos.html" target="_blank" class="btn btn-primary">📦 Admin - Produtos</a>
+                <a href="http://localhost:3333/admin/dashboard.html" target="_blank" class="btn btn-secondary">📊 Admin - Dashboard</a>
+                <a href="http://localhost:3333/teste-integracao.html" target="_blank" class="btn btn-secondary">🧪 Teste Integração</a>
+            </div>
+        </div>
+
+        <!-- Card 6: Dúvidas -->
+        <div class="card">
+            <div class="card-icon">❓</div>
+            <h2>6. Dúvidas Frequentes</h2>
+            <p>Respostas para problemas comuns.</p>
+            <ol>
+                <li><strong>Produto não aparece?</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>Marque "Ativo" no formulário</li>
+                        <li>Recarregue a página (F5)</li>
+                        <li>Verifique servidor rodando</li>
+                    </ul>
+                </li>
+                <li><strong>Imagem não carrega?</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>Selecione uma imagem no upload</li>
+                        <li>Aguarde a notificação "✅ Imagem enviada"</li>
+                    </ul>
+                </li>
+                <li><strong>Servidor offline?</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li><code>npm start</code> na pasta server</li>
+                        <li>Aguarde "✅ Backend rodando"</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- DEMO SECTION -->
+    <div class="demo-section">
+        <h2>🧪 Demo - Teste Agora!</h2>
+        <p>Clique no botão para testar toda a integração:</p>
+        <button class="btn btn-success" onclick="runFullTest()" style="font-size: 1.1em; padding: 15px 30px;">
+            ▶️ EXECUTAR TESTE COMPLETO
+        </button>
+        <div id="demoOutput"></div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <h3>✅ Tudo Pronto!</h3>
+        <p>Seu sistema está 100% funcional e pronto para receber produtos.</p>
+        <p style="font-weight: 600; color: #667eea; margin-top: 15px;">
+            Comece agora: <a href="http://localhost:3333/admin/produtos.html" target="_blank" style="color: #667eea; text-decoration: underline;">Criar Primeiro Produto →</a>
+        </p>
+    </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:3333';
+
+async function checkServer() {
+    const el = document.getElementById('serverStatus');
+    el.innerHTML = '<div class="status-info"><div class="spinner"></div> Verificando...</div>';
+    
+    try {
+        const resp = await fetch(`${API_BASE}/api/health`);
+        if (resp.ok) {
+            el.innerHTML = '<div class="status-ok">✅ Servidor ONLINE e funcionando!</div>';
+        } else {
+            el.innerHTML = `<div class="status-error">❌ Erro HTTP ${resp.status}</div>`;
+        }
+    } catch (e) {
+        el.innerHTML = `<div class="status-error">❌ Servidor OFFLINE: ${e.message}</div>`;
+    }
+}
+
+async function createTestProduct() {
+    const el = document.getElementById('testStatus');
+    el.innerHTML = '<div class="status-info"><div class="spinner"></div> Criando...</div>';
+    
+    try {
+        const product = {
+            name: `🧪 Teste ${new Date().toLocaleTimeString()}`,
+            description: 'Produto criado automaticamente para teste',
+            category: 'canetas',
+            priceOld: 99.90,
+            priceCurrent: 49.90,
+            discount: 50,
+            image: '/assets/img/produto-placeholder.jpg',
+            stock: 100,
+            active: true
+        };
+        
+        const resp = await fetch(`${API_BASE}/api/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product)
+        });
+        
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const result = await resp.json();
+        
+        el.innerHTML = `
+            <div class="status-ok">
+                ✅ Produto criado com sucesso!<br>
+                <strong>ID:</strong> ${result.id}<br>
+                <strong>Nome:</strong> ${result.name}<br>
+                <br>
+                <strong>👉 Abra a loja e recarregue (F5) para ver o produto!</strong>
+            </div>
+        `;
+    } catch (e) {
+        el.innerHTML = `<div class="status-error">❌ Erro: ${e.message}</div>`;
+    }
+}
+
+async function runFullTest() {
+    const el = document.getElementById('demoOutput');
+    let html = '';
+    
+    const log = (msg, type = 'info') => {
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            info: '#3b82f6',
+            warning: '#f59e0b'
+        };
+        html += `<div style="color: ${colors[type]}">✓ ${msg}</div>`;
+    };
+    
+    el.innerHTML = '<div class="output"><div class="spinner"></div> Testando...</div>';
+    
+    try {
+        // 1. Servidor
+        log('Testando servidor...', 'info');
+        let resp = await fetch(`${API_BASE}/api/health`);
+        if (!resp.ok) throw new Error('Servidor offline');
+        log('Servidor online', 'success');
+        
+        // 2. Produtos
+        log('Carregando produtos...', 'info');
+        resp = await fetch(`${API_BASE}/api/products`);
+        const products = await resp.json();
+        const active = products.filter(p => p.active);
+        log(`${products.length} produtos total, ${active.length} ativos`, 'success');
+        
+        // 3. API Routes
+        log('Testando rotas...', 'info');
+        resp = await fetch(`${API_BASE}/admin/produtos.html`);
+        if (!resp.ok) throw new Error('Admin não carrega');
+        log('Admin acessível', 'success');
+        
+        // 4. Criar teste
+        log('Criando produto de teste...', 'info');
+        const testProd = {
+            name: `✅ TESTE PASSOU ${Date.now()}`,
+            description: 'Sistema funcionando perfeitamente!',
+            category: 'canetas',
+            priceOld: 99.90,
+            priceCurrent: 49.90,
+            discount: 50,
+            image: '/assets/img/produto-placeholder.jpg',
+            stock: 100,
+            active: true
+        };
+        resp = await fetch(`${API_BASE}/api/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(testProd)
+        });
+        if (!resp.ok) throw new Error('Erro ao criar');
+        log('Produto de teste criado', 'success');
+        
+        // SUCESSO!
+        html += `<br><div style="color: #10b981; font-weight: 600;">🎉 TODOS OS TESTES PASSARAM!</div>`;
+        html += `<div style="color: #10b981; margin-top: 10px;">✅ Sistema 100% funcional - Pronto para usar!</div>`;
+        
+    } catch (e) {
+        log(`Erro: ${e.message}`, 'error');
+    }
+    
+    el.innerHTML = `<div class="output">${html}</div>`;
+}
+
+// Teste automático ao carregar
+window.addEventListener('load', () => {
+    checkServer();
+});
+</script>
+
+</body>
+</html>

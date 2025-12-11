@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💰 Adicionar Preços aos Produtos</title>
+  <style>
+    body {
+      font-family: Poppins, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 20px 0;
+    }
+    h1 { color: #0a893f; }
+    .product-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 15px;
+      align-items: center;
+      padding: 15px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      background: #0a893f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #067a31;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .success { background: #d3f9d8; color: #2f5233; }
+    .error { background: #ffe0e0; color: #5c2e2e; }
+    .info { background: #e7f5ff; color: #1c4995; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>💰 Adicionar Preços aos Produtos</h1>
+    <p>Preencha os preços dos produtos abaixo:</p>
+    
+    <div id="status"></div>
+    <div id="productsList"></div>
+    
+    <button onclick="salvarTodosPrecosEBulk()">💾 Salvar Todos os Preços (Bulk)</button>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3333';
+
+    async function carregarProdutos() {
+      try {
+        const response = await fetch(`${API_BASE}/api/products`);
+        if (!response.ok) throw new Error('Erro ao carregar produtos');
+        
+        const products = await response.json();
+        const lista = document.getElementById('productsList');
+        
+        lista.innerHTML = products.map(p => `
+          <div class="product-row">
+            <div>
+              <strong>${p.name}</strong>
+              <p style="color: #666; font-size: 0.9rem;">${p.description?.substring(0, 50)}...</p>
+            </div>
+            <input type="number" id="price_${p.id}" placeholder="Preço" value="${p.priceCurrent || ''}" step="0.01" min="0">
+            <input type="number" id="old_${p.id}" placeholder="Preço Original" value="${p.priceOld || ''}" step="0.01" min="0">
+            <input type="number" id="discount_${p.id}" placeholder="Desconto %" value="${p.discount || ''}" step="1" min="0" max="100">
+            <button onclick="salvarPreco(${p.id})">✓</button>
+          </div>
+        `).join('');
+        
+        document.getElementById('status').innerHTML = `<div class="status info">✓ ${products.length} produtos carregados</div>`;
+      } catch (e) {
+        document.getElementById('status').innerHTML = `<div class="status error">❌ Erro: ${e.message}</div>`;
+      }
+    }
+
+    async function salvarPreco(id) {
+      const price = parseFloat(document.getElementById(`price_${id}`).value) || 0;
+      const priceOld = parseFloat(document.getElementById(`old_${id}`).value) || null;
+      const discount = parseInt(document.getElementById(`discount_${id}`).value) || null;
+
+      try {
+        const response = await fetch(`${API_BASE}/api/products/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            priceCurrent: price,
+            priceOld: priceOld,
+            discount: discount
+          })
+        });
+
+        if (!response.ok) throw new Error('Erro ao salvar');
+        console.log(`✓ Produto ${id} atualizado`);
+      } catch (e) {
+        alert(`Erro ao salvar produto ${id}: ${e.message}`);
+      }
+    }
+
+    async function salvarTodosPrecosEBulk() {
+      const inputs = document.querySelectorAll('input[type="number"]');
+      let count = 0;
+
+      // Agrupar por produto ID
+      const updates = {};
+      inputs.forEach(input => {
+        const id = input.id.split('_')[1];
+        if (!updates[id]) updates[id] = {};
+
+        if (input.id.startsWith('price_')) updates[id].priceCurrent = parseFloat(input.value) || 0;
+        if (input.id.startsWith('old_')) updates[id].priceOld = parseFloat(input.value) || null;
+        if (input.id.startsWith('discount_')) updates[id].discount = parseInt(input.value) || null;
+      });
+
+      // Salvar cada um
+      for (const [id, data] of Object.entries(updates)) {
+        try {
+          const response = await fetch(`${API_BASE}/api/products/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (response.ok) count++;
+        } catch (e) {
+          console.error(`Erro ao salvar ${id}:`, e);
+        }
+      }
+
+      document.getElementById('status').innerHTML = `<div class="status success">✅ ${count} produto(s) atualizado(s) com sucesso!</div>`;
+      
+      // Avisar ao site público
+      localStorage.setItem('productsChanged', 'true');
+      localStorage.setItem('lastProductsSync', new Date().toISOString());
+    }
+
+    // Carregar ao entrar
+    document.addEventListener('DOMContentLoaded', carregarProdutos);
+  </script>
+</body>
+</html>

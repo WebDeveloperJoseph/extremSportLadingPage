@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Produtos de Materiais Escolares</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2ecc71;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        .status {
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .log {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        .warning { color: #f59e0b; }
+        
+        button {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(46, 204, 113, 0.3);
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(46, 204, 113, 0.4);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .product-preview {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+        .product-preview:hover {
+            border-color: #2ecc71;
+            box-shadow: 0 4px 16px rgba(46, 204, 113, 0.2);
+        }
+        .product-preview img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .product-preview h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #111;
+        }
+        .product-preview .price {
+            color: #2ecc71;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        .product-preview .old-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Adicionar Produtos de Materiais Escolares</h1>
+        <p class="subtitle">Importar produtos com as imagens da pasta assets/img</p>
+        
+        <div class="status">
+            <h3 style="color: #2ecc71; margin-bottom: 15px;">📊 Status da Operação</h3>
+            <div class="log" id="log"></div>
+        </div>
+
+        <button onclick="addAllProducts()" id="addBtn">
+            ✨ Adicionar Todos os Produtos
+        </button>
+
+        <div class="products-grid" id="productsPreview"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3333';
+        
+        const produtos = [
+            {
+                name: '🎒 Bolsa Escolar Leão Kids',
+                description: 'Mochila infantil com design de leão, ideal para crianças. Compartimentos espaçosos e alças ajustáveis.',
+                image: '/assets/img/bolsaLeao.webp',
+                priceOld: 89.90,
+                priceCurrent: 64.90,
+                discount: 28,
+                category: 'mochilas',
+                active: true
+            },
+            {
+                name: '🎒 Bolsa One Piece Premium',
+                description: 'Mochila temática One Piece para fãs de anime. Resistente e espaçosa, perfeita para o dia a dia escolar.',
+                image: '/assets/img/bolsaOnipiece.webp',
+                priceOld: 129.90,
+                priceCurrent: 89.90,
+                discount: 31,
+                category: 'mochilas',
+                active: true
+            },
+            {
+                name: '🎒 Bolsa Escolar Preta Classic',
+                description: 'Mochila preta clássica e versátil. Design elegante com múltiplos bolsos para organização.',
+                image: '/assets/img/bolsaPreta.jpg',
+                priceOld: 79.90,
+                priceCurrent: 54.90,
+                discount: 31,
+                category: 'mochilas',
+                active: true
+            },
+            {
+                name: '🎒 Bolsa Escolar Rosa Fashion',
+                description: 'Mochila rosa vibrante perfeita para meninas. Estampas modernas e compartimentos práticos.',
+                image: '/assets/img/bolsaRosa.jpg',
+                priceOld: 84.90,
+                priceCurrent: 59.90,
+                discount: 29,
+                category: 'mochilas',
+                active: true
+            },
+            {
+                name: '🎒 Bolsa Escolar Roxa Deluxe',
+                description: 'Mochila roxa com design sofisticado. Material resistente à água e alças ergonômicas.',
+                image: '/assets/img/bolsaRoxa.webp',
+                priceOld: 94.90,
+                priceCurrent: 69.90,
+                discount: 26,
+                category: 'mochilas',
+                active: true
+            },
+            {
+                name: '🪑 Kit 4 Cadeiras Escolares Ergonômicas',
+                description: 'Conjunto de 4 cadeiras escolares com design ergonômico. Altura ajustável, perfeitas para estudo.',
+                image: '/assets/img/cadeirasescolares.webp',
+                priceOld: 459.90,
+                priceCurrent: 329.90,
+                discount: 28,
+                category: 'mobiliario',
+                active: true
+            },
+            {
+                name: '🗄️ Armário Escolar Infantil 4 Portas',
+                description: 'Armário colorido para organização escolar infantil. 4 compartimentos espaçosos com portas.',
+                image: '/assets/img/armarioinfantilescolar.webp',
+                priceOld: 389.90,
+                priceCurrent: 279.90,
+                discount: 28,
+                category: 'mobiliario',
+                active: true
+            },
+            {
+                name: '✏️ Kit Completo Material Escolar 50 Itens',
+                description: 'Kit super completo com 50 itens essenciais: lápis, canetas, borrachas, réguas, cadernos e muito mais!',
+                image: '/assets/img/kit.webp',
+                priceOld: 149.90,
+                priceCurrent: 99.90,
+                discount: 33,
+                category: 'papelaria',
+                active: true
+            },
+            {
+                name: '✏️ Kit 72 Lápis de Cor Profissional',
+                description: 'Estojo com 72 lápis de cor de alta qualidade. Cores vibrantes e pigmentação intensa para artistas.',
+                image: '/assets/img/kitLapis.webp',
+                priceOld: 89.90,
+                priceCurrent: 59.90,
+                discount: 33,
+                category: 'papelaria',
+                active: true
+            },
+            {
+                name: '🖨️ Impressora Multifuncional HP DeskJet',
+                description: 'Impressora, copiadora e scanner em um só aparelho. Conexão WiFi, ideal para trabalhos escolares.',
+                image: '/assets/img/impressora.webp',
+                priceOld: 549.90,
+                priceCurrent: 399.90,
+                discount: 27,
+                category: 'eletronicos',
+                active: true
+            },
+            {
+                name: '📚 Mega Kit Materiais Escolares 2025',
+                description: 'Coleção completa com diversos modelos de materiais: cadernos, lápis, canetas, mochilas, estojos e acessórios.',
+                image: '/assets/img/imagem-com-diversos-modelos-de-materiais-escolares.webp',
+                priceOld: 299.90,
+                priceCurrent: 199.90,
+                discount: 33,
+                category: 'kits',
+                active: true
+            }
+        ];
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const item = document.createElement('div');
+            item.className = `log-item ${type}`;
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            item.textContent = `[${timestamp}] ${message}`;
+            log.appendChild(item);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function showPreview() {
+            const preview = document.getElementById('productsPreview');
+            preview.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 20px; background: #f0fdf4; border-radius: 12px; margin-bottom: 20px;">
+                    <h2 style="color: #2ecc71; margin-bottom: 10px;">📦 ${produtos.length} Produtos Prontos</h2>
+                    <p style="color: #666;">Clique no botão acima para adicionar todos os produtos ao servidor</p>
+                </div>
+            `;
+            
+            produtos.forEach(p => {
+                preview.innerHTML += `
+                    <div class="product-preview">
+                        <img src="${p.image}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22150%22%3E%3Crect fill=%22%23e5e7eb%22 width=%22200%22 height=%22150%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22%3E📷%3C/text%3E%3C/svg%3E'">
+                        <h3>${p.name}</h3>
+                        <p style="font-size: 0.85rem; color: #666; margin: 8px 0;">${p.description.substring(0, 60)}...</p>
+                        <div>
+                            <span class="price">R$ ${p.priceCurrent.toFixed(2)}</span>
+                            <span class="old-price">R$ ${p.priceOld.toFixed(2)}</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 0.85rem; color: #2ecc71; font-weight: 600;">
+                            💰 ${p.discount}% OFF
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        async function addAllProducts() {
+            const btn = document.getElementById('addBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Adicionando...';
+            
+            addLog('🚀 Iniciando importação de produtos...', 'info');
+            
+            let success = 0;
+            let errors = 0;
+
+            for (let i = 0; i < produtos.length; i++) {
+                const produto = produtos[i];
+                addLog(`📦 [${i+1}/${produtos.length}] Adicionando: ${produto.name}`, 'info');
+                
+                try {
+                    const response = await fetch(`${API_BASE}/api/products`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(produto)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        addLog(`✅ Sucesso! ID: ${result.id}`, 'success');
+                        success++;
+                    } else {
+                        const error = await response.text();
+                        addLog(`❌ Erro: ${error}`, 'error');
+                        errors++;
+                    }
+                } catch (e) {
+                    addLog(`❌ Falha na conexão: ${e.message}`, 'error');
+                    errors++;
+                }
+                
+                // Pequeno delay entre requisições
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+
+            addLog('', 'info');
+            addLog('═══════════════════════════════════', 'info');
+            addLog(`📊 RESUMO FINAL:`, 'info');
+            addLog(`✅ Sucessos: ${success}`, 'success');
+            addLog(`❌ Erros: ${errors}`, errors > 0 ? 'error' : 'info');
+            addLog(`📦 Total processado: ${produtos.length}`, 'info');
+            addLog('═══════════════════════════════════', 'info');
+            
+            if (success > 0) {
+                addLog('', 'info');
+                addLog('🎉 Produtos adicionados com sucesso!', 'success');
+                addLog('🌐 Acesse o site público para visualizar', 'info');
+                addLog('🔗 http://localhost:3333/index.html', 'info');
+            }
+
+            btn.disabled = false;
+            btn.textContent = success === produtos.length ? '✅ Produtos Adicionados!' : '🔄 Tentar Novamente';
+        }
+
+        // Mostrar preview ao carregar
+        addLog('📚 Sistema de importação carregado', 'success');
+        addLog(`📦 ${produtos.length} produtos prontos para importação`, 'info');
+        addLog('💡 Clique no botão acima para iniciar', 'warning');
+        showPreview();
+    </script>
+</body>
+</html>

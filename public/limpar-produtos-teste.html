@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗑️ Remover Produtos de Teste</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+        h1 { color: #ef4444; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 30px; }
+        .log-box {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .log-line { margin-bottom: 8px; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        .info { color: #3b82f6; }
+        button {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: none;
+        }
+        .status.ok {
+            background: #d1fae5;
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border: 2px solid #ef4444;
+        }
+        .products-list {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .product-item {
+            padding: 10px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 4px solid #ef4444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-name {
+            font-weight: 600;
+            color: #333;
+        }
+        .product-id {
+            color: #999;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Remover Produtos de Teste</h1>
+        <p class="subtitle">Encontra e remove todos os produtos com "Teste" no nome</p>
+        
+        <div class="log-box" id="log"></div>
+        <div id="status"></div>
+        
+        <button onclick="findTestProducts()">🔍 Buscar Produtos de Teste</button>
+        <button onclick="deleteAllTestProducts()" id="deleteBtn" disabled>🗑️ Deletar TODOS</button>
+        <button onclick="clearLog()">🗑️ Limpar Log</button>
+        
+        <div class="products-list" id="products" style="display: none;">
+            <strong>📦 Produtos Encontrados:</strong>
+            <div id="productsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3333';
+        let testProducts = [];
+        
+        function log(message, type = 'info') {
+            const logBox = document.getElementById('log');
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            const timestamp = new Date().toLocaleTimeString('pt-BR');
+            line.textContent = `[${timestamp}] ${message}`;
+            logBox.appendChild(line);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            log('✅ Log limpo');
+        }
+        
+        async function findTestProducts() {
+            log('🔍 Buscando produtos com "Teste" no nome...', 'info');
+            testProducts = [];
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/products`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const allProducts = await response.json();
+                log(`✅ ${allProducts.length} produto(s) total carregado(s)`, 'info');
+                
+                // Filtrar produtos com "teste" no nome (case-insensitive)
+                testProducts = allProducts.filter(p => 
+                    p.name.toLowerCase().includes('teste')
+                );
+                
+                if (testProducts.length === 0) {
+                    log('✅ Nenhum produto de teste encontrado!', 'success');
+                    document.getElementById('status').className = 'status ok';
+                    document.getElementById('status').textContent = '✅ Nenhum produto de teste para remover';
+                    document.getElementById('status').style.display = 'block';
+                    document.getElementById('deleteBtn').disabled = true;
+                } else {
+                    log(`⚠️ ${testProducts.length} produto(s) de teste encontrado(s)!`, 'warning');
+                    
+                    // Exibir lista
+                    const productsList = document.getElementById('productsList');
+                    productsList.innerHTML = testProducts.map(p => `
+                        <div class="product-item">
+                            <div>
+                                <div class="product-name">🧪 ${p.name}</div>
+                                <div class="product-id">ID: ${p.id}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('products').style.display = 'block';
+                    document.getElementById('deleteBtn').disabled = false;
+                    
+                    document.getElementById('status').className = 'status error';
+                    document.getElementById('status').textContent = `⚠️ ${testProducts.length} produto(s) pronto(s) para deletar`;
+                    document.getElementById('status').style.display = 'block';
+                    
+                    testProducts.forEach(p => {
+                        log(`  • ${p.name} (ID: ${p.id})`, 'warning');
+                    });
+                }
+                
+            } catch (e) {
+                log(`❌ Erro: ${e.message}`, 'error');
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').textContent = `❌ Erro ao buscar produtos: ${e.message}`;
+                document.getElementById('status').style.display = 'block';
+            }
+        }
+        
+        async function deleteAllTestProducts() {
+            if (testProducts.length === 0) {
+                log('⚠️ Nenhum produto de teste para deletar', 'warning');
+                return;
+            }
+            
+            if (!confirm(`⚠️ CUIDADO! Isso vai deletar ${testProducts.length} produto(s).\n\nTem certeza?`)) {
+                log('❌ Operação cancelada pelo usuário', 'warning');
+                return;
+            }
+            
+            if (!confirm('⚠️ SEGUNDA CONFIRMAÇÃO: Realmente quer deletar TODOS?')) {
+                log('❌ Operação cancelada pelo usuário', 'warning');
+                return;
+            }
+            
+            log(`🗑️ Iniciando exclusão de ${testProducts.length} produto(s)...`, 'warning');
+            
+            const deleteBtn = document.getElementById('deleteBtn');
+            deleteBtn.disabled = true;
+            const originalText = deleteBtn.textContent;
+            deleteBtn.textContent = '⏳ Deletando...';
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (let i = 0; i < testProducts.length; i++) {
+                const product = testProducts[i];
+                
+                try {
+                    log(`[${i + 1}/${testProducts.length}] Deletando: ${product.name}...`, 'info');
+                    
+                    const response = await fetch(`${API_BASE}/api/products/${product.id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        log(`✅ Deletado com sucesso! ID: ${product.id}`, 'success');
+                        successCount++;
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                } catch (e) {
+                    log(`❌ Erro ao deletar ${product.name}: ${e.message}`, 'error');
+                    errorCount++;
+                }
+                
+                // Pequeno delay entre requisições
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            log('', 'info');
+            log('═══════════════════════════════════', 'info');
+            log(`📊 RESULTADO FINAL:`, 'info');
+            log(`✅ Deletados com sucesso: ${successCount}`, 'success');
+            log(`❌ Erros na exclusão: ${errorCount}`, errorCount > 0 ? 'error' : 'info');
+            log(`📦 Total processado: ${testProducts.length}`, 'info');
+            log('═══════════════════════════════════', 'info');
+            
+            if (successCount === testProducts.length) {
+                log('🎉 Todos os produtos de teste foram removidos!', 'success');
+                document.getElementById('status').className = 'status ok';
+                document.getElementById('status').textContent = '✅ Todos os produtos de teste foram removidos!';
+                document.getElementById('products').style.display = 'none';
+                testProducts = [];
+            } else {
+                log(`⚠️ ${errorCount} produto(s) não foi(ram) deletado(s)`, 'warning');
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').textContent = `❌ Erro ao deletar alguns produtos`;
+            }
+            
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = originalText;
+        }
+        
+        // Inicializar
+        log('✅ Ferramenta de limpeza carregada', 'success');
+        log(`🌐 API: ${API_BASE}`, 'info');
+        log('Clique em "Buscar Produtos de Teste" para começar', 'info');
+    </script>
+</body>
+</html>

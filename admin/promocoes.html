@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Promoções</title>
+  <link rel="stylesheet" href="admin-modern.css">
+</head>
+<body class="admin-body">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>🛒 Admin Panel</h2>
+      <p>Pretinho Variedades</p>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="dashboard.html">📊 Dashboard</a></li>
+        <li><a href="produtos.html">📦 Produtos</a></li>
+        <li><a href="pedidos.html">🛍️ Pedidos</a></li>
+        <li><a href="categorias.html">📁 Categorias</a></li>
+        <li><a href="banners.html">🖼️ Banners</a></li>
+        <li><a href="destaques.html">⭐ Destaques</a></li>
+        <li><a href="promocoes.html" class="active">🎉 Promoções</a></li>
+        <li><a href="configuracoes.html">⚙️ Configurações</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="../public/index.html" target="_blank" class="btn-view-site">🌐 Ver Site</a>
+      <button id="logoutBtn" class="btn-logout">🚪 Sair</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-topbar">
+      <div class="topbar-left"><h1>Promoções</h1></div>
+      <div class="topbar-right"><span class="admin-user">👤 Admin</span></div>
+    </header>
+
+    <div class="admin-content">
+      <div style="background:#fff; padding:16px; border-radius:10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom:16px;">
+        <h3 style="margin-bottom:12px;">📋 Como funciona:</h3>
+        <ul style="margin-left:16px; line-height:1.8;">
+          <li>Defina o <strong>Preço Antigo</strong> (preço original antes da promoção)</li>
+          <li>Defina o <strong>Preço Atual</strong> (preço promocional)</li>
+          <li>O <strong>Desconto %</strong> é calculado automaticamente</li>
+          <li>Marque como <strong>Promoção Ativa</strong> para aparecer no site</li>
+        </ul>
+      </div>
+
+      <div id="promotionsList" class="products-list"></div>
+    </div>
+  </main>
+
+  <script src="../js/admin-promocoes.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+        }
+        #status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: none;
+        }
+        #status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        #status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        #status.loading {
+            background: #fff3cd;
+            color: #856404;
+            display: block;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de Upload Isolado</h1>
+    
+    <div class="form-group">
+        <label for="fileInput">Selecione uma imagem:</label>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
+    
+    <div id="status"></div>
+    
+    <div id="result"></div>
+    
+    <hr>
+    <button onclick="window.location.reload()">🔄 Recarregar Página Manualmente</button>
+
+    <script>
+        const API_BASE = 'http://localhost:3333';
+        
+        console.log('✅ Script carregado');
+        
+        // Interceptar QUALQUER reload
+        let reloadDetected = false;
+        window.addEventListener('beforeunload', function(e) {
+            reloadDetected = true;
+            console.error('🚨🚨🚨 RELOAD DETECTADO! 🚨🚨🚨');
+            console.trace('Stack trace:');
+        });
+        
+        // Prevenir submit
+        document.addEventListener('submit', function(e) {
+            console.error('❌ Submit bloqueado!');
+            e.preventDefault();
+            return false;
+        }, true);
+        
+        const fileInput = document.getElementById('fileInput');
+        const statusEl = document.getElementById('status');
+        const resultEl = document.getElementById('result');
+        
+        fileInput.addEventListener('change', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            
+            console.log('📤 Evento change disparado');
+            console.log('📤 reloadDetected:', reloadDetected);
+            
+            if (!this.files || !this.files.length) {
+                console.log('⚠️ Nenhum arquivo');
+                return;
+            }
+            
+            const file = this.files[0];
+            console.log(`📦 Arquivo selecionado: ${file.name} (${(file.size/1024).toFixed(2)}KB)`);
+            
+            // Status
+            statusEl.className = 'loading';
+            statusEl.textContent = `⏳ Enviando ${file.name}...`;
+            
+            // Preparar FormData
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                console.log('🌐 Iniciando requisição...');
+                
+                const response = await fetch(`${API_BASE}/api/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log(`📡 Status: ${response.status}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Resposta:', data);
+                
+                statusEl.className = 'success';
+                statusEl.textContent = `✅ Upload concluído: ${file.name}`;
+                
+                resultEl.innerHTML = `
+                    <h3>Resultado:</h3>
+                    <p><strong>Filename:</strong> ${data.filename}</p>
+                    <p><strong>URL:</strong> <a href="${data.url}" target="_blank">${data.url}</a></p>
+                    <img src="${data.url}" style="max-width: 100%; margin-top: 10px;">
+                `;
+                
+                console.log('✅ Upload concluído com sucesso');
+                console.log('📤 reloadDetected após upload:', reloadDetected);
+                
+                if (reloadDetected) {
+                    console.error('🚨 PÁGINA FOI RECARREGADA DURANTE O UPLOAD!');
+                } else {
+                    console.log('✅ Nenhum reload detectado - tudo OK!');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                
+                statusEl.className = 'error';
+                statusEl.textContent = `❌ Erro: ${error.message}`;
+            }
+            
+            return false;
+        }, true);
+        
+        console.log('✅ Listener registrado');
+    </script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Teste - Salvar Banner</title>
+  <style>
+    body {
+      font-family: Poppins, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #0a893f; margin-top: 0; }
+    h2 { color: #27ae60; border-bottom: 2px solid #98D447; padding-bottom: 10px; }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    button {
+      background: #0a893f;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover { background: #27ae60; }
+    .log {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 13px;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-top: 10px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .error { color: #ff6b6b; }
+    .success { color: #51cf66; }
+    .warning { color: #ffd43b; }
+    .info { color: #74c0fc; }
+    .status {
+      padding: 15px;
+      border-radius: 6px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .status.ok { background: #d3f9d8; color: #2f5233; }
+    .status.error { background: #ffe0e0; color: #5c2e2e; }
+    .status.pending { background: #e7f5ff; color: #1c4995; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Teste de Salvamento de Banner</h1>
+  
+  <div class="card">
+    <h2>1️⃣ Teste de Conexão</h2>
+    <button onclick="testConnection()">🌐 Testar Conexão com API</button>
+    <div id="testStatus"></div>
+    <div id="testLog" class="log"></div>
+  </div>
+
+  <div class="card">
+    <h2>2️⃣ Teste de Upload de Imagem</h2>
+    <input type="file" id="testFile" accept="image/*">
+    <button onclick="testUpload()">📤 Testar Upload</button>
+    <div id="uploadStatus"></div>
+    <div id="uploadLog" class="log"></div>
+  </div>
+
+  <div class="card">
+    <h2>3️⃣ Teste de Criar Banner</h2>
+    <label>Imagem URL:
+      <input type="text" id="testImage" placeholder="https://..." value="https://via.placeholder.com/800x400?text=Test+Banner">
+    </label>
+    <label>Título:
+      <input type="text" id="testTitle" placeholder="Título do banner" value="Banner de Teste">
+    </label>
+    <label>Subtítulo:
+      <input type="text" id="testSubtitle" placeholder="Subtítulo" value="Subtítulo de teste">
+    </label>
+    <label>Link:
+      <input type="text" id="testLink" placeholder="https://..." value="https://exemplo.com">
+    </label>
+    <label>Ordem:
+      <input type="number" id="testOrder" value="1">
+    </label>
+    <label>Ativo:
+      <select id="testActive">
+        <option value="true">Sim</option>
+        <option value="false">Não</option>
+      </select>
+    </label>
+    <button onclick="testSaveBanner()">💾 Criar Banner</button>
+    <div id="saveStatus"></div>
+    <div id="saveLog" class="log"></div>
+  </div>
+
+  <div class="card">
+    <h2>4️⃣ Teste de Listar Banners</h2>
+    <button onclick="testListBanners()">📋 Listar Banners</button>
+    <div id="listStatus"></div>
+    <div id="listLog" class="log"></div>
+  </div>
+
+  <div class="card">
+    <h2>5️⃣ Console em Tempo Real</h2>
+    <button onclick="clearConsole()">🗑️ Limpar Console</button>
+    <button onclick="copyConsole()">📋 Copiar Logs</button>
+    <div id="liveLog" class="log"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3333';
+    let liveLogContent = [];
+
+    function log(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      const prefix = {
+        'error': '❌',
+        'success': '✅',
+        'warning': '⚠️',
+        'info': 'ℹ️'
+      }[type] || '•';
+      
+      const formatted = `[${timestamp}] ${prefix} ${message}`;
+      liveLogContent.push(formatted);
+      
+      const liveLog = document.getElementById('liveLog');
+      liveLog.innerHTML = liveLogContent.join('\n');
+      liveLog.scrollTop = liveLog.scrollHeight;
+      
+      console.log(formatted);
+    }
+
+    function updateLog(elementId, message, type = 'info') {
+      const element = document.getElementById(elementId);
+      if (!element) return;
+      
+      const timestamp = new Date().toLocaleTimeString();
+      const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+      const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+      
+      element.innerHTML += `<div class="${className}">[${timestamp}] ${prefix} ${message}</div>`;
+      element.scrollTop = element.scrollHeight;
+    }
+
+    function setStatus(elementId, message, type = 'pending') {
+      const element = document.getElementById(elementId);
+      element.innerHTML = `<div class="status ${type}">${message}</div>`;
+    }
+
+    async function testConnection() {
+      log('🌐 Iniciando teste de conexão...', 'info');
+      setStatus('testStatus', '🔄 Testando...', 'pending');
+      updateLog('testLog', 'Testando GET /api/banners...', 'info');
+      
+      try {
+        log(`Conectando a: ${API_BASE}/api/banners`, 'info');
+        const response = await fetch(`${API_BASE}/api/banners`);
+        
+        updateLog('testLog', `Status: ${response.status}`, 'info');
+        log(`Status da resposta: ${response.status}`, 'info');
+        
+        if (response.ok) {
+          const data = await response.json();
+          updateLog('testLog', `✅ Conectado! Banners encontrados: ${data.length}`, 'success');
+          log(`Banners encontrados: ${data.length}`, 'success');
+          setStatus('testStatus', '✅ Conexão OK!', 'ok');
+        } else {
+          updateLog('testLog', `❌ Erro HTTP ${response.status}`, 'error');
+          log(`Erro HTTP ${response.status}`, 'error');
+          setStatus('testStatus', `❌ Erro: ${response.status}`, 'error');
+        }
+      } catch (e) {
+        updateLog('testLog', `❌ ${e.message}`, 'error');
+        log(`Erro: ${e.message}`, 'error');
+        setStatus('testStatus', `❌ ${e.message}`, 'error');
+      }
+    }
+
+    async function testUpload() {
+      const file = document.getElementById('testFile').files[0];
+      if (!file) {
+        setStatus('uploadStatus', '❌ Selecione um arquivo', 'error');
+        return;
+      }
+      
+      log(`📤 Iniciando upload de: ${file.name}`, 'info');
+      setStatus('uploadStatus', '🔄 Fazendo upload...', 'pending');
+      updateLog('uploadLog', `Arquivo: ${file.name}`, 'info');
+      updateLog('uploadLog', `Tamanho: ${(file.size / 1024).toFixed(2)} KB`, 'info');
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      try {
+        log(`Enviando para: ${API_BASE}/api/upload`, 'info');
+        const response = await fetch(`${API_BASE}/api/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        updateLog('uploadLog', `Status: ${response.status}`, 'info');
+        log(`Status do upload: ${response.status}`, 'info');
+        
+        if (response.ok) {
+          const data = await response.json();
+          updateLog('uploadLog', `✅ URL: ${data.url}`, 'success');
+          log(`URL retornada: ${data.url}`, 'success');
+          setStatus('uploadStatus', '✅ Upload OK!', 'ok');
+          document.getElementById('testImage').value = data.url;
+        } else {
+          const error = await response.text();
+          updateLog('uploadLog', `❌ Erro: ${error}`, 'error');
+          log(`Erro: ${error}`, 'error');
+          setStatus('uploadStatus', `❌ Erro: ${response.status}`, 'error');
+        }
+      } catch (e) {
+        updateLog('uploadLog', `❌ ${e.message}`, 'error');
+        log(`Erro: ${e.message}`, 'error');
+        setStatus('uploadStatus', `❌ ${e.message}`, 'error');
+      }
+    }
+
+    async function testSaveBanner() {
+      const image = document.getElementById('testImage').value.trim();
+      const title = document.getElementById('testTitle').value.trim();
+      const subtitle = document.getElementById('testSubtitle').value.trim();
+      const link = document.getElementById('testLink').value.trim();
+      const ord = Number(document.getElementById('testOrder').value) || 1;
+      const active = document.getElementById('testActive').value === 'true';
+
+      if (!image || !title) {
+        setStatus('saveStatus', '❌ Informe imagem e título', 'error');
+        return;
+      }
+
+      log('💾 Iniciando salvamento de banner...', 'info');
+      setStatus('saveStatus', '🔄 Salvando...', 'pending');
+      
+      const payload = { image, title, subtitle, link, ord, active };
+      
+      updateLog('saveLog', `Payload: ${JSON.stringify(payload, null, 2)}`, 'info');
+      log(`Payload: ${JSON.stringify(payload)}`, 'info');
+
+      try {
+        log(`Enviando POST para: ${API_BASE}/api/banners`, 'info');
+        updateLog('saveLog', `POST ${API_BASE}/api/banners`, 'info');
+        
+        const response = await fetch(`${API_BASE}/api/banners`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        updateLog('saveLog', `Status: ${response.status}`, 'info');
+        log(`Status da resposta: ${response.status}`, 'info');
+
+        const responseText = await response.text();
+        updateLog('saveLog', `Resposta bruta: ${responseText}`, 'info');
+        log(`Resposta: ${responseText}`, 'info');
+
+        if (response.ok) {
+          try {
+            const savedBanner = JSON.parse(responseText);
+            updateLog('saveLog', `✅ Banner salvo! ID: ${savedBanner.id}`, 'success');
+            log(`Banner salvo com ID: ${savedBanner.id}`, 'success');
+            setStatus('saveStatus', `✅ Banner salvo com ID: ${savedBanner.id}`, 'ok');
+          } catch (e) {
+            updateLog('saveLog', `⚠️ Resposta não é JSON válido`, 'warning');
+            log(`Resposta não é JSON: ${e.message}`, 'warning');
+            setStatus('saveStatus', '⚠️ Salvo mas resposta inválida', 'warning');
+          }
+        } else {
+          updateLog('saveLog', `❌ HTTP ${response.status}: ${responseText}`, 'error');
+          log(`Erro HTTP ${response.status}: ${responseText}`, 'error');
+          setStatus('saveStatus', `❌ Erro: ${response.status}`, 'error');
+        }
+      } catch (e) {
+        updateLog('saveLog', `❌ ${e.message}`, 'error');
+        log(`Erro: ${e.message}`, 'error');
+        setStatus('saveStatus', `❌ ${e.message}`, 'error');
+      }
+    }
+
+    async function testListBanners() {
+      log('📋 Listando banners...', 'info');
+      setStatus('listStatus', '🔄 Carregando...', 'pending');
+      updateLog('listLog', 'Requisitando GET /api/banners...', 'info');
+      
+      try {
+        log(`GET ${API_BASE}/api/banners`, 'info');
+        const response = await fetch(`${API_BASE}/api/banners`);
+        
+        updateLog('listLog', `Status: ${response.status}`, 'info');
+        log(`Status: ${response.status}`, 'info');
+
+        if (response.ok) {
+          const banners = await response.json();
+          updateLog('listLog', `✅ ${banners.length} banners encontrados`, 'success');
+          updateLog('listLog', JSON.stringify(banners, null, 2), 'info');
+          log(`Banners encontrados: ${banners.length}`, 'success');
+          setStatus('listStatus', `✅ ${banners.length} banners`, 'ok');
+        } else {
+          const error = await response.text();
+          updateLog('listLog', `❌ ${error}`, 'error');
+          log(`Erro: ${error}`, 'error');
+          setStatus('listStatus', `❌ Erro`, 'error');
+        }
+      } catch (e) {
+        updateLog('listLog', `❌ ${e.message}`, 'error');
+        log(`Erro: ${e.message}`, 'error');
+        setStatus('listStatus', `❌ ${e.message}`, 'error');
+      }
+    }
+
+    function clearConsole() {
+      liveLogContent = [];
+      document.getElementById('liveLog').innerHTML = '';
+      log('Console limpo', 'info');
+    }
+
+    function copyConsole() {
+      const text = liveLogContent.join('\n');
+      navigator.clipboard.writeText(text).then(() => {
+        log('Logs copiados para clipboard!', 'success');
+      });
+    }
+
+    // Auto-teste ao carregar
+    log('Página carregada. API_BASE=' + API_BASE, 'info');
+  </script>
+</body>
+</html>

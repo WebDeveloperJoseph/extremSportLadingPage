@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - Pretinho Variedades</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .category-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--cor-verde-principal);
+            background: white;
+            color: var(--cor-verde-principal);
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .filter-btn:hover {
+            background: var(--cor-verde-principal);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-verde-media);
+        }
+
+        .filter-btn.active {
+            background: var(--gradiente-verde-1);
+            color: white;
+            border-color: transparent;
+            box-shadow: var(--sombra-verde-forte);
+        }
+
+        .category-section {
+            margin-bottom: 60px;
+            display: none;
+        }
+
+        .category-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--cor-verde-principal);
+        }
+
+        .category-header h2 {
+            font-size: 2rem;
+            color: var(--cor-verde-principal);
+            margin: 0;
+        }
+
+        .category-count {
+            background: var(--cor-verde-limao);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .empty-category {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--cor-texto-medio);
+        }
+
+        .empty-category svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .products-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .search-box-top {
+            background: var(--gradiente-verde-1);
+            padding: 40px 20px;
+            margin: -80px 0 40px 0;
+            border-radius: 0 0 30px 30px;
+            text-align: center;
+        }
+
+        .search-box-top input {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            box-shadow: var(--sombra-verde-forte);
+        }
+
+        .search-box-top input::placeholder {
+            color: #999;
+        }
+
+        .sort-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+        }
+
+        .sort-btn {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .sort-btn:hover,
+        .sort-btn.active {
+            background: var(--cor-verde-principal);
+            color: white;
+            border-color: var(--cor-verde-principal);
+        }
+
+        .products-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .products-info-text {
+            color: var(--cor-texto-medio);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .category-filters {
+                gap: 10px;
+            }
+
+            .filter-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .category-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER FIXO -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="logo">Pretinho Variedades</div>
+            </div>
+
+            <nav class="main-nav" id="mainNav">
+                <ul>
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="produtos.html" class="nav-link">Produtos</a></li>
+                    <li><a href="index.html#contato" class="nav-link">Contato</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="search" id="searchTop" placeholder="Buscar...">
+                    <button type="button">🔍</button>
+                </div>
+                <a href="carrinho.html" class="cart-icon">
+                    🛒 <span class="cart-count">0</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="mobile-search-bar" id="mobileSearchBar">
+            <input type="search" id="searchMobile" placeholder="Buscar produtos...">
+            <button type="button">🔍</button>
+        </div>
+    </header>
+
+    <!-- Menu Backdrop -->
+    <div class="menu-backdrop" id="menuBackdrop"></div>
+
+    <!-- Hero da página -->
+    <section class="hero-section products-hero">
+        <div class="container">
+            <p class="eyebrow">Catálogo completo</p>
+            <h1 class="hero-title">🛍️ TODOS OS PRODUTOS</h1>
+            <p class="hero-subtitle">Encontre tudo que você precisa para volta às aulas!</p>
+        </div>
+    </section>
+
+    <!-- Search Box -->
+    <section class="search-box-top">
+        <input type="search" id="globalSearch" placeholder="🔍 Buscar produtos por nome, categoria, preço..." style="color: var(--cor-texto-escuro);">
+    </section>
+
+    <!-- Main Container -->
+    <div class="container" style="padding: 40px 20px;">
+
+        <!-- Filtros de Categoria -->
+        <div class="category-filters" id="categoryFilters">
+            <button class="filter-btn active" data-category="all">
+                ✨ Todos os Produtos
+            </button>
+            <button class="filter-btn" data-category="mochilas">
+                🎒 Mochilas
+            </button>
+            <button class="filter-btn" data-category="canetas">
+                ✏️ Canetas
+            </button>
+            <button class="filter-btn" data-category="cadernos">
+                📓 Cadernos
+            </button>
+            <button class="filter-btn" data-category="estojos">
+                📦 Estojos
+            </button>
+            <button class="filter-btn" data-category="papelaria">
+                📄 Papelaria
+            </button>
+            <button class="filter-btn" data-category="outros">
+                🎁 Outros
+            </button>
+        </div>
+
+        <!-- Opções de Ordenação -->
+        <div class="sort-options" style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: flex-end;">
+            <button class="sort-btn active" data-sort="relevancia">⭐ Relevância</button>
+            <button class="sort-btn" data-sort="preco-baixo">💰 Menor Preço</button>
+            <button class="sort-btn" data-sort="preco-alto">💎 Maior Preço</button>
+            <button class="sort-btn" data-sort="nome">A-Z Nome</button>
+        </div>
+
+        <!-- Container de Produtos -->
+        <div class="products-container">
+            <div class="products-info">
+                <span class="products-info-text">
+                    📦 <strong id="productCount">0</strong> produto(s) encontrado(s)
+                </span>
+            </div>
+
+            <div class="products-grid" id="productsGrid">
+                <!-- Produtos carregados dinamicamente -->
+            </div>
+
+            <div class="empty-category" id="emptyMessage" style="display: none;">
+                <p style="font-size: 1.2rem;">😕 Nenhum produto encontrado</p>
+                <p>Tente ajustar seus filtros ou termos de busca</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RODAPÉ -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Pretinho Variedades</h4>
+                    <p>Sua loja de materiais escolares com os melhores preços!</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Atendimento</h4>
+                    <p>Segunda a Sexta: 8h - 18h</p>
+                    <p>Sábado: 8h - 12h</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p>📞 (83) 99851-1065</p>
+                    <p>📈 Rua 6 de Julho (Perto da Feira Livre de Nova Floresta)</p>
+                    <p>📱 <a href="https://www.instagram.com/pretinhovariedades/" target="_blank">Instagram: @pretinhovariedades</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Pretinho Variedades. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.API_BASE = localStorage.getItem('API_BASE') || window.location.origin;
+        let allProducts = [];
+        let filteredProducts = [];
+        let currentCategory = 'all';
+        let currentSort = 'relevancia';
+
+        // Categorias Mapeadas
+        const categoryMap = {
+            'mochilas': ['Mochila', 'mochila'],
+            'canetas': ['Caneta', 'caneta', 'Pen', 'pen'],
+            'cadernos': ['Caderno', 'caderno', 'Notebook', 'notebook'],
+            'estojos': ['Estojo', 'estojo', 'Necessaire', 'necessaire'],
+            'papelaria': ['Papel', 'papel', 'Post-it', 'post-it', 'Adesivo', 'adesivo'],
+            'outros': []
+        };
+
+        // Obter parâmetro do URL
+        function getUrlParameter(param) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(param);
+        }
+
+        // Definir categoria do URL se existir
+        function setInitialCategory() {
+            const urlCategory = getUrlParameter('category');
+            if (urlCategory && Object.keys(categoryMap).includes(urlCategory)) {
+                currentCategory = urlCategory;
+                // Ativar o botão correto
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.category === urlCategory) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Carregar produtos
+        async function loadProducts() {
+            try {
+                console.log(`🌐 Conectando à API: ${window.API_BASE}/api/products`);
+                const response = await fetch(`${window.API_BASE}/api/products`);
+                if (!response.ok) throw new Error('Erro ao carregar produtos');
+                
+                allProducts = await response.json();
+                console.log(`✅ ${allProducts.length} produto(s) carregado(s)`);
+                console.log('📊 Primeiro produto completo:', allProducts[0]);
+                console.log('💰 Preços dos primeiros 3:', allProducts.slice(0, 3).map(p => ({
+                    nome: p.name,
+                    priceCurrent: p.priceCurrent,
+                    priceOld: p.priceOld,
+                    discount: p.discount,
+                    active: p.active
+                })));
+                
+                // Definir categoria initial do URL APÓS carregar produtos
+                setInitialCategory();
+                filterAndRender();
+                setupEventListeners();
+            } catch (error) {
+                console.error('❌ Erro ao carregar produtos:', error);
+                document.getElementById('productsGrid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <p style="font-size: 48px; margin-bottom: 20px;">⚠️</p>
+                        <h3>Erro ao carregar produtos</h3>
+                        <p>Verifique se o servidor está rodando</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Classificar produto em categoria
+        function getProductCategory(productName) {
+            for (const [category, keywords] of Object.entries(categoryMap)) {
+                for (const keyword of keywords) {
+                    if (productName.toLowerCase().includes(keyword.toLowerCase())) {
+                        return category;
+                    }
+                }
+            }
+            return 'outros';
+        }
+
+        // Filtrar e renderizar
+        function filterAndRender() {
+            // Filtrar por categoria
+            if (currentCategory === 'all') {
+                filteredProducts = [...allProducts];
+            } else {
+                filteredProducts = allProducts.filter(p => getProductCategory(p.name) === currentCategory);
+            }
+
+            // Ordenar
+            filteredProducts.sort((a, b) => {
+                switch (currentSort) {
+                    case 'preco-baixo':
+                        return (a.priceCurrent || 0) - (b.priceCurrent || 0);
+                    case 'preco-alto':
+                        return (b.priceCurrent || 0) - (a.priceCurrent || 0);
+                    case 'nome':
+                        return a.name.localeCompare(b.name, 'pt-BR');
+                    default:
+                        return 0;
+                }
+            });
+
+            renderProducts();
+            updateInfo();
+        }
+
+        // Renderizar produtos
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const emptyMessage = document.getElementById('emptyMessage');
+
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = '';
+                emptyMessage.style.display = 'block';
+                return;
+            }
+
+            emptyMessage.style.display = 'none';
+            grid.innerHTML = filteredProducts.map((product, index) => {
+                const imageUrl = product.image?.startsWith('http') ? product.image : window.API_BASE + product.image;
+                const finalPrice = Number(product.priceCurrent || 0).toFixed(2);
+                const originalPrice = product.priceOld ? Number(product.priceOld).toFixed(2) : null;
+                
+                return `
+                <div class="product-card" style="animation-delay: ${index * 0.05}s">
+                    <div class="product-image">
+                        <img src="${imageUrl || 'https://via.placeholder.com/250x250?text=Produto'}" 
+                             alt="${product.name}"
+                             loading="lazy"
+                             onerror="this.src='https://via.placeholder.com/250x250?text=Sem+Imagem'"
+                             style="width: 90%; height: 90%; object-fit: contain;">
+                        ${product.discount ? `<span class="product-badge">-${product.discount}%</span>` : ''}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-description">${product.description || 'Produto de qualidade'}</p>
+                        <div class="product-pricing">
+                            ${originalPrice ? `<span class="price-old">R$ ${originalPrice}</span>` : ''}
+                            <span class="price-current">R$ ${finalPrice}</span>
+                        </div>
+                        <button class="btn-add-cart" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${finalPrice})">
+                            🛒 Adicionar ao Carrinho
+                        </button>
+                    </div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Atualizar informações
+        function updateInfo() {
+            document.getElementById('productCount').textContent = filteredProducts.length;
+            updateCartCount();
+        }
+
+        // Atualizar contagem de carrinho
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelector('.cart-count').textContent = count;
+        }
+
+        // Adicionar ao carrinho
+        function addToCart(productId, productName, price) {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ id: productId, name: productName, price, quantity: 1 });
+            }
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            
+            // Feedback visual
+            event.target.textContent = '✅ Adicionado!';
+            setTimeout(() => event.target.textContent = '🛒 Adicionar ao Carrinho', 1500);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Filtros de categoria
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.dataset.category;
+                    
+                    // Atualizar URL
+                    const newUrl = currentCategory === 'all' 
+                        ? 'produtos.html' 
+                        : `produtos.html?category=${currentCategory}`;
+                    window.history.pushState({}, '', newUrl);
+                    
+                    filterAndRender();
+                });
+            });
+
+            // Botões de ordenação
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentSort = btn.dataset.sort;
+                    filterAndRender();
+                });
+            });
+
+            // Busca global
+            document.getElementById('globalSearch').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                if (!searchTerm) {
+                    filterAndRender();
+                    return;
+                }
+
+                filteredProducts = allProducts.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) ||
+                    (p.description && p.description.toLowerCase().includes(searchTerm))
+                );
+
+                renderProducts();
+                updateInfo();
+            });
+
+            // Menu mobile
+            setupMobileMenu();
+        }
+
+        // Menu Mobile
+        function setupMobileMenu() {
+            const menuToggle = document.getElementById('menuToggle');
+            const mainNav = document.getElementById('mainNav');
+            const menuBackdrop = document.getElementById('menuBackdrop');
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    mainNav.classList.toggle('active');
+                    menuBackdrop.classList.toggle('active');
+                    menuToggle.classList.toggle('active');
+                });
+
+                menuBackdrop.addEventListener('click', () => {
+                    mainNav.classList.remove('active');
+                    menuBackdrop.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                });
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            updateCartCount();
+        });
+    </script>
+</body>
+</html>

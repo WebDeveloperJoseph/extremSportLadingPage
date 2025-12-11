@@ -3,114 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedidos - Extreme Sport Admin</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/admin.css">
-    <link rel="stylesheet" href="styles/pedidos.css">
+    <title>Gerenciar Pedidos - Admin</title>
+    <link rel="stylesheet" href="admin-modern.css">
 </head>
-<body>
-    <div class="admin-wrapper">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h1>EXTREME SPORT</h1>
-                <p>Painel Admin</p>
-                <button class="nav-toggle" onclick="toggleAdminNav()" aria-label="Menu">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+<body class="admin-body">
+
+    <!-- SIDEBAR ADMIN -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>🛒 Admin Panel</h2>
+            <p>Pretinho Variedades</p>
+        </div>
+
+        <nav class=\"sidebar-nav\">
+            <ul>
+                <li><a href=\"index.html\">📦 Produtos</a></li>
+                <li><a href=\"pedidos.html\" class=\"active\">🛍️ Pedidos</a></li>
+                <li><a href="categorias.html">📁 Categorias</a></li>
+                <li><a href="banners.html">🖼️ Banners</a></li>
+                <li><a href="destaques.html">⭐ Destaques</a></li>
+                <li><a href="promocoes.html">🎉 Promoções</a></li>
+                <li><a href="configuracoes.html">⚙️ Configurações</a></li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="../public/index.html" target="_blank" class="btn-view-site">🌐 Ver Site</a>
+            <button id="logoutBtn" class="btn-logout">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="admin-main">
+        <!-- TOPBAR -->
+        <header class="admin-topbar">
+            <div class="topbar-left">
+                <h1>Gerenciar Pedidos</h1>
             </div>
-            
-            <nav class="sidebar-nav" id="adminNav">
-                <a href="painel.html" class="nav-link">
-                    <span class="icon">📊</span>
-                    Dashboard
-                </a>
-                <a href="produtos.html" class="nav-link">
-                    <span class="icon">📦</span>
-                    Produtos
-                </a>
-                <a href="pedidos.html" class="nav-link active">
-                    <span class="icon">🛒</span>
-                    Pedidos
-                </a>
-                <a href="../index.html" class="nav-link" target="_blank">
-                    <span class="icon">🌐</span>
-                    Ver Site
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <span class="icon">👤</span>
-                    <span id="userEmail">Carregando...</span>
-                </div>
-                <button class="btn-logout" onclick="logout()">Sair</button>
+            <div class="topbar-right">
+                <select id="filterStatus" class="status-filter">
+                    <option value="">Todos os Status</option>
+                    <option value="pending">Pendente</option>
+                    <option value="processing">Processando</option>
+                    <option value="shipped">Enviado</option>
+                    <option value="delivered">Entregue</option>
+                    <option value="cancelled">Cancelado</option>
+                </select>
             </div>
-        </aside>
+        </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="content-header">
-                <h2>Pedidos</h2>
-                <div class="header-filters">
-                    <select id="filtroStatus" onchange="carregarPedidos()">
-                        <option value="">Todos os status</option>
-                        <option value="pendente">Pendente</option>
-                        <option value="confirmado">Confirmado</option>
-                        <option value="enviado">Enviado</option>
-                        <option value="entregue">Entregue</option>
-                        <option value="cancelado">Cancelado</option>
-                    </select>
-                </div>
-            </header>
-
-            <!-- Orders List -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>Todos os Pedidos</h3>
-                    <div style="display:flex; align-items:center; gap:10px; flex-wrap: wrap;">
-                        <span id="totalCount">0 pedidos</span>
-                        <button class="btn" type="button" onclick="carregarPedidos()">Recarregar</button>
-                        <button class="btn" type="button" onclick="diagnosticarPedidos()">Diagnóstico</button>
-                        <button class="btn btn-primary" type="button" onclick="criarPedidoTeste()">Criar Pedido Teste</button>
+        <!-- CONTEÚDO -->
+        <div class="admin-content">
+            <!-- CARDS DE RESUMO -->
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card stat-orange">
+                    <div class="stat-icon">🛍️</div>
+                    <div class="stat-details">
+                        <h3 id="totalOrders">0</h3>
+                        <p>Total de Pedidos</p>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div id="pedidosLista">
-                        <div class="loading">Carregando pedidos...</div>
+
+                <div class="stat-card stat-blue">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-details">
+                        <h3 id="pendingOrders">0</h3>
+                        <p>Pedidos Pendentes</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-green">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-details">
+                        <h3 id="totalRevenue">R$ 0,00</h3>
+                        <p>Faturamento Total</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-purple">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-details">
+                        <h3 id="shippedOrders">0</h3>
+                        <p>Pedidos Enviados</p>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <!-- Modal Pedido Detalhes -->
-    <div id="modalPedido" class="modal">
-        <div class="modal-content modal-large">
+            <!-- GRID DE PEDIDOS -->
+            <div class="orders-grid" id="ordersGrid">
+                <!-- Pedidos serão carregados via JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DETALHES DO PEDIDO -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h3 id="modalTitle">Detalhes do Pedido</h3>
-                <button class="modal-close" onclick="fecharModalPedido()">&times;</button>
+                <h2>Detalhes do Pedido <span id="orderIdModal"></span></h2>
+                <button class="modal-close">&times;</button>
             </div>
-            <div class="modal-body" id="pedidoDetalhes">
-                <!-- Conteúdo será preenchido dinamicamente -->
+
+            <div id="orderDetailsContent" class="order-details" style="padding: 30px;">
+                <!-- Detalhes serão carregados via JavaScript -->
             </div>
         </div>
     </div>
 
-    <!-- Overlay -->
-    <div id="modalOverlay" class="modal-overlay" onclick="fecharModalPedido()"></div>
-
-    <!-- Toast Notifications -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../config/supabase.js"></script>
-    <script src="scripts/auth-guard.js"></script>
-    <script src="scripts/pedidos.js"></script>
+    <script>
+        window.API_BASE = localStorage.getItem('API_BASE') || window.location.origin;
+    </script>
+    <script src="../public/js/admin-pedidos.js"></script>
 </body>
 </html>

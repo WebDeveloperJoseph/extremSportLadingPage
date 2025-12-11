@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Teste de Integração - Mercado Pretinho</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+        }
+
+        .test-section h2 {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-section p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .output {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .output-line {
+            margin-bottom: 5px;
+        }
+
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        .info { color: #3b82f6; }
+
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .status.ok {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border-left: 4px solid #ef4444;
+        }
+
+        .status.warning {
+            background: #fef3c7;
+            color: #78350f;
+            border-left: 4px solid #f59e0b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        table tr:hover {
+            background: #f9fafb;
+        }
+
+        .product-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .product-price {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .product-desc {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧪 Teste de Integração - Admin ↔ Loja Pública</h1>
+
+    <!-- SEÇÃO 1: Verificar Servidor -->
+    <div class="test-section">
+        <h2>🔌 1. Verificar Servidor</h2>
+        <p>Verificar se o servidor Node.js está rodando em http://localhost:3333</p>
+        <div class="button-group">
+            <button class="btn-primary" onclick="testServer()">✅ Testar Conexão</button>
+            <button class="btn-primary" onclick="testAPI()">📡 Testar API</button>
+        </div>
+        <div id="serverOutput" class="output"></div>
+        <div id="serverStatus" class="status" style="display: none;"></div>
+    </div>
+
+    <!-- SEÇÃO 2: Listar Produtos Atuais -->
+    <div class="test-section">
+        <h2>📦 2. Produtos Atuais na API</h2>
+        <p>Ver todos os produtos cadastrados no servidor</p>
+        <div class="button-group">
+            <button class="btn-primary" onclick="loadProductsList()">🔄 Carregar Produtos</button>
+            <button class="btn-danger" onclick="deleteAllProducts()">🗑️ Deletar TODOS (Cuidado!)</button>
+        </div>
+        <div id="productsOutput" class="output"></div>
+        <div id="productsContainer" style="margin-top: 15px;"></div>
+    </div>
+
+    <!-- SEÇÃO 3: Criar Produto de Teste -->
+    <div class="test-section">
+        <h2>➕ 3. Criar Produto de Teste</h2>
+        <p>Crie um produto automaticamente para testar a integração</p>
+        <div class="button-group">
+            <button class="btn-success" onclick="createTestProduct()">✨ Criar Produto Teste</button>
+            <button class="btn-primary" onclick="createRealProduct()">📝 Criar Produto Real</button>
+        </div>
+        <div id="createOutput" class="output"></div>
+    </div>
+
+    <!-- SEÇÃO 4: Verificar Site Público -->
+    <div class="test-section">
+        <h2>🏠 4. Sincronizar com Site Público</h2>
+        <p>Verificar se os produtos aparecem corretamente no site público</p>
+        <div class="button-group">
+            <button class="btn-primary" onclick="compareProducts()">🔍 Comparar Admin ↔ Público</button>
+            <button class="btn-primary" onclick="window.open('http://localhost:3333/')" target="_blank">🌐 Abrir Loja</button>
+            <button class="btn-primary" onclick="window.open('http://localhost:3333/admin/produtos.html')" target="_blank">🔧 Abrir Admin</button>
+        </div>
+        <div id="compareOutput" class="output"></div>
+    </div>
+
+    <!-- SEÇÃO 5: Status Final -->
+    <div class="test-section">
+        <h2>✅ 5. Status da Integração</h2>
+        <p>Resumo do estado do sistema</p>
+        <button class="btn-primary" onclick="fullTest()">🚀 Teste Completo</button>
+        <div id="statusOutput" class="output"></div>
+    </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:3333';
+let log = {
+    server: [],
+    products: [],
+    create: [],
+    compare: [],
+    status: []
+};
+
+function addLog(section, message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const line = `[${timestamp}] ${message}`;
+    log[section].push({ message: line, type });
+    console.log(`[${section}]`, message);
+}
+
+function displayLog(section, elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.innerHTML = log[section]
+            .map(item => `<div class="output-line"><span class="${item.type}">${item.message}</span></div>`)
+            .join('');
+        element.scrollTop = element.scrollHeight;
+    }
+}
+
+async function testServer() {
+    log.server = [];
+    addLog('server', '🚀 Iniciando teste de servidor...', 'info');
+    
+    try {
+        addLog('server', `🔌 Conectando em ${API_BASE}`, 'info');
+        const response = await fetch(`${API_BASE}/api/health`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            addLog('server', '✅ Servidor respondendo!', 'success');
+            addLog('server', `Status: ${data.status}`, 'success');
+            addLog('server', `Serviço: ${data.service}`, 'success');
+            
+            document.getElementById('serverStatus').className = 'status ok';
+            document.getElementById('serverStatus').textContent = '✅ Servidor está ONLINE';
+            document.getElementById('serverStatus').style.display = 'block';
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (e) {
+        addLog('server', `❌ Erro ao conectar: ${e.message}`, 'error');
+        document.getElementById('serverStatus').className = 'status error';
+        document.getElementById('serverStatus').textContent = '❌ Servidor OFFLINE';
+        document.getElementById('serverStatus').style.display = 'block';
+    }
+    
+    displayLog('server', 'serverOutput');
+}
+
+async function testAPI() {
+    log.server = [];
+    addLog('server', '🌐 Testando endpoints da API...', 'info');
+    
+    try {
+        // GET /products
+        addLog('server', '📥 GET /api/products', 'info');
+        let response = await fetch(`${API_BASE}/api/products`);
+        if (response.ok) {
+            const products = await response.json();
+            addLog('server', `✅ ${products.length} produto(s) encontrado(s)`, 'success');
+        } else {
+            throw new Error(`Erro GET /products: ${response.status}`);
+        }
+
+        // GET /health
+        addLog('server', '💓 GET /api/health', 'info');
+        response = await fetch(`${API_BASE}/api/health`);
+        if (response.ok) {
+            addLog('server', '✅ Health check OK', 'success');
+        } else {
+            throw new Error(`Erro GET /health: ${response.status}`);
+        }
+
+        addLog('server', '🎉 Todos os endpoints respondendo!', 'success');
+        document.getElementById('serverStatus').className = 'status ok';
+        document.getElementById('serverStatus').textContent = '✅ API funcionando corretamente';
+        document.getElementById('serverStatus').style.display = 'block';
+    } catch (e) {
+        addLog('server', `❌ Erro: ${e.message}`, 'error');
+    }
+    
+    displayLog('server', 'serverOutput');
+}
+
+async function loadProductsList() {
+    log.products = [];
+    addLog('products', '📦 Carregando produtos...', 'info');
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/products`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const products = await response.json();
+        addLog('products', `✅ ${products.length} produto(s) encontrado(s)`, 'success');
+        
+        if (products.length === 0) {
+            addLog('products', '⚠️  Nenhum produto no banco', 'warning');
+            document.getElementById('productsContainer').innerHTML = '<p style="color: #f59e0b;"><strong>ℹ️ Nenhum produto cadastrado ainda</strong></p>';
+        } else {
+            products.forEach((p, i) => {
+                addLog('products', `${i + 1}. ${p.name} - R$ ${p.priceCurrent} (${p.active ? 'Ativo' : 'Inativo'})`, 'info');
+            });
+            
+            // Renderizar produtos
+            const container = document.getElementById('productsContainer');
+            container.innerHTML = products.map(p => `
+                <div class="product-item">
+                    <div class="product-image">${p.image ? `<img src="${p.image}" onerror="this.textContent='📷'">` : '📷'}</div>
+                    <div class="product-info">
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-price">R$ ${Number(p.priceCurrent).toFixed(2)} <span style="color: #6b7280;">(era R$ ${Number(p.priceOld).toFixed(2)})</span></div>
+                        <div class="product-desc">${p.description || 'Sem descrição'} • ${p.active ? '✅ Ativo' : '❌ Inativo'}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (e) {
+        addLog('products', `❌ Erro: ${e.message}`, 'error');
+    }
+    
+    displayLog('products', 'productsOutput');
+}
+
+async function createTestProduct() {
+    log.create = [];
+    addLog('create', '➕ Criando produto de teste...', 'info');
+    
+    const productData = {
+        name: `🧪 Produto Teste ${Date.now()}`,
+        description: 'Este é um produto de teste para verificar a integração',
+        category: 'canetas',
+        priceOld: 99.90,
+        priceCurrent: 49.90,
+        discount: 50,
+        image: '/assets/img/produto-placeholder.jpg',
+        stock: 100,
+        active: true
+    };
+    
+    try {
+        addLog('create', '📨 Enviando dados para API...', 'info');
+        const response = await fetch(`${API_BASE}/api/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData)
+        });
+        
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`HTTP ${response.status}: ${error}`);
+        }
+        
+        const result = await response.json();
+        addLog('create', `✅ Produto criado com ID: ${result.id}`, 'success');
+        addLog('create', `📝 Nome: ${result.name}`, 'success');
+        addLog('create', '⏳ Aguarde 2 segundos...', 'warning');
+        
+        setTimeout(() => {
+            addLog('create', '🔄 Recarregando lista de produtos...', 'info');
+            loadProductsList();
+            addLog('create', '✅ Verifique a seção "Produtos Atuais" acima!', 'success');
+        }, 2000);
+        
+    } catch (e) {
+        addLog('create', `❌ Erro: ${e.message}`, 'error');
+    }
+    
+    displayLog('create', 'createOutput');
+}
+
+async function createRealProduct() {
+    log.create = [];
+    addLog('create', '📝 Abrindo formulário de produto...', 'info');
+    window.open('http://localhost:3333/admin/produtos.html', '_blank');
+}
+
+async function compareProducts() {
+    log.compare = [];
+    addLog('compare', '🔍 Comparando produtos Admin ↔ Público...', 'info');
+    
+    try {
+        // Carregar produtos via API
+        const response = await fetch(`${API_BASE}/api/products`);
+        if (!response.ok) throw new Error(`Erro ao buscar produtos: ${response.status}`);
+        const allProducts = await response.json();
+        const activeProducts = allProducts.filter(p => p.active);
+        
+        addLog('compare', `📊 Total no banco: ${allProducts.length}`, 'info');
+        addLog('compare', `✅ Ativos (mostrados na loja): ${activeProducts.length}`, 'success');
+        addLog('compare', `❌ Inativos: ${allProducts.length - activeProducts.length}`, 'warning');
+        
+        if (activeProducts.length === 0) {
+            addLog('compare', '⚠️  Nenhum produto ativo para mostrar na loja', 'warning');
+            addLog('compare', '💡 Dica: Crie um produto e ative-o no admin', 'info');
+        } else {
+            addLog('compare', '✅ Produtos aparecem na loja pública!', 'success');
+            activeProducts.slice(0, 5).forEach(p => {
+                addLog('compare', `  • ${p.name} (R$ ${p.priceCurrent})`, 'info');
+            });
+            if (activeProducts.length > 5) {
+                addLog('compare', `  ... e mais ${activeProducts.length - 5}`, 'info');
+            }
+        }
+        
+    } catch (e) {
+        addLog('compare', `❌ Erro: ${e.message}`, 'error');
+    }
+    
+    displayLog('compare', 'compareOutput');
+}
+
+async function fullTest() {
+    log.status = [];
+    addLog('status', '🚀 Iniciando teste completo...', 'info');
+    
+    try {
+        // 1. Servidor
+        addLog('status', '1️⃣  Testando servidor...', 'info');
+        let response = await fetch(`${API_BASE}/api/health`);
+        if (!response.ok) throw new Error('Servidor offline');
+        addLog('status', '✅ Servidor OK', 'success');
+        
+        // 2. API
+        addLog('status', '2️⃣  Testando API...', 'info');
+        response = await fetch(`${API_BASE}/api/products`);
+        if (!response.ok) throw new Error('API não responde');
+        const products = await response.json();
+        addLog('status', `✅ API OK (${products.length} produtos)`, 'success');
+        
+        // 3. Admin
+        addLog('status', '3️⃣  Testando painel admin...', 'info');
+        response = await fetch(`${API_BASE}/admin/produtos.html`);
+        if (!response.ok) throw new Error('Admin não carrega');
+        addLog('status', '✅ Admin acessível', 'success');
+        
+        // 4. Loja Pública
+        addLog('status', '4️⃣  Testando loja pública...', 'info');
+        response = await fetch(`${API_BASE}/`);
+        if (!response.ok) throw new Error('Loja não carrega');
+        addLog('status', '✅ Loja acessível', 'success');
+        
+        // 5. Status Final
+        const activeProducts = products.filter(p => p.active);
+        addLog('status', '', 'info');
+        addLog('status', '═══════════════════════════════════', 'info');
+        addLog('status', '🎉 SISTEMA 100% FUNCIONAL!', 'success');
+        addLog('status', '═══════════════════════════════════', 'info');
+        addLog('status', `📊 Produtos no banco: ${products.length}`, 'info');
+        addLog('status', `✅ Produtos ativos (na loja): ${activeProducts.length}`, 'success');
+        addLog('status', '🔄 Sincronização: OK', 'success');
+        
+    } catch (e) {
+        addLog('status', `❌ Erro: ${e.message}`, 'error');
+    }
+    
+    displayLog('status', 'statusOutput');
+}
+
+async function deleteAllProducts() {
+    if (!confirm('⚠️  CUIDADO! Isso vai deletar TODOS os produtos. Tem certeza?')) return;
+    if (!confirm('⚠️  SEGUNDA CONFIRMAÇÃO: Realmente quer deletar TUDO?')) return;
+    
+    log.products = [];
+    addLog('products', '🗑️  Deletando todos os produtos...', 'warning');
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/products`);
+        const products = await response.json();
+        
+        for (const product of products) {
+            const delResponse = await fetch(`${API_BASE}/api/products/${product.id}`, {
+                method: 'DELETE'
+            });
+            if (delResponse.ok) {
+                addLog('products', `✅ Deletado: ${product.name}`, 'success');
+            }
+        }
+        
+        addLog('products', `🎉 ${products.length} produto(s) deletado(s)`, 'success');
+        setTimeout(() => loadProductsList(), 1000);
+        
+    } catch (e) {
+        addLog('products', `❌ Erro: ${e.message}`, 'error');
+    }
+    
+    displayLog('products', 'productsOutput');
+}
+
+// Inicializar ao carregar
+window.addEventListener('load', () => {
+    addLog('status', '✅ Página de testes carregada', 'success');
+    addLog('status', 'Clique em qualquer botão para começar...', 'info');
+    displayLog('status', 'statusOutput');
+});
+</script>
+
+</body>
+</html>

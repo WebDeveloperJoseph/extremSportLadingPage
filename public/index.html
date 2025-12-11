@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretinho Variedades | Volta às Aulas 2025</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- HEADER FIXO -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="logo">Pretinho Variedades</div>
+            </div>
+
+            <nav class="main-nav" id="mainNav">
+                <ul>
+                    <li><a href="produtos.html" class="nav-link">📦 Todos os Produtos</a></li>
+                    <li><a href="#categorias" class="nav-link">Categorias</a></li>
+                    <li><a href="#ofertas" class="nav-link">Ofertas</a></li>
+                    <li><a href="#contato" class="nav-link">Contato</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-right">
+                <div class="search-box">
+                    <input type="search" placeholder="Buscar...">
+                    <button type="button">🔍</button>
+                </div>
+                <a href="carrinho.html" class="cart-icon">
+                    🛒 <span class="cart-count"></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Mobile Search Bar -->
+        <div class="mobile-search-bar" id="mobileSearchBar">
+            <input type="search" placeholder="Buscar produtos...">
+            <button type="button">🔍</button>
+        </div>
+    </header>
+
+    <!-- Menu Backdrop/Overlay -->
+    <div class="menu-backdrop" id="menuBackdrop"></div>
+
+    <!-- HERO SECTION (Banner Principal) -->
+    <section class="hero-section hero-background-image" data-animate>
+        <div class="hero-content">
+            <h1 class="hero-title">VOLTA ÀS AULAS</h1>
+            <p class="hero-subtitle">Tudo que seu filho precisa com <strong>DESCONTOS INCRÍVEIS!</strong></p>
+        </div>
+    </section>
+
+    <!-- Banner Carousel -->
+    <section class="banner-carousel" data-animate>
+        <div class="slides"></div>
+        <button class="nav prev">‹</button>
+        <button class="nav next">›</button>
+    </section>
+
+    <!-- SEÇÃO DE CATEGORIAS EM DESTAQUE -->
+    <section class="highlights-section" id="categorias" data-animate>
+        <div class="container">
+            <h2 class="section-title">Categorias em Destaque</h2>
+            <div class="highlight-grid">
+                <div class="highlight-card card-green">
+                    <div class="card-icon">🎒</div>
+                    <h3>MOCHILAS</h3>
+                    <p>Diversos tamanhos e modelos</p>
+                    <a href="produtos.html?category=mochilas" class="card-link">Ver produtos →</a>
+                </div>
+                <div class="highlight-card card-orange">
+                    <div class="card-icon">✏️</div>
+                    <h3>CANETAS</h3>
+                    <p>Para colorir e escrever</p>
+                    <a href="produtos.html?category=canetas" class="card-link">Ver produtos →</a>
+                </div>
+                <div class="highlight-card card-orange">
+                    <div class="card-icon">📓</div>
+                    <h3>CADERNOS</h3>
+                    <p>Espiral, brochura e mais</p>
+                    <a href="produtos.html?category=cadernos" class="card-link">Ver produtos →</a>
+                </div>
+                <div class="highlight-card card-green">
+                    <div class="card-icon">📦</div>
+                    <h3>ESTOJOS</h3>
+                    <p>Organização e estilo</p>
+                    <a href="produtos.html?category=estojos" class="card-link">Ver produtos →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEÇÃO DE PRODUTOS EM OFERTA -->
+    <section class="products-section" id="ofertas" data-animate>
+        <div class="container">
+            <h2 class="section-title">🔥 Ofertas Imperdíveis</h2>
+            <div class="products-grid">
+                <!-- Produtos carregados dinamicamente pelo products.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Carrosseis de Destaque -->
+    <section class="feature-carousels" data-animate>
+        <div class="container">
+            <div id="carousel-mais-vendidos" class="carousel-block">
+                <div class="carousel-header">
+                    <h3 class="carousel-title">Mais Vendidos</h3>
+                    <div class="carousel-actions">
+                        <button class="carousel-nav prev">◀</button>
+                        <button class="carousel-nav next">▶</button>
+                    </div>
+                </div>
+                <div class="carousel-track"></div>
+            </div>
+
+            <div id="carousel-novidades" class="carousel-block">
+                <div class="carousel-header">
+                    <h3 class="carousel-title">Novidades</h3>
+                    <div class="carousel-actions">
+                        <button class="carousel-nav prev">◀</button>
+                        <button class="carousel-nav next">▶</button>
+                    </div>
+                </div>
+                <div class="carousel-track"></div>
+            </div>
+
+            <div id="carousel-promocoes" class="carousel-block">
+                <div class="carousel-header">
+                    <h3 class="carousel-title">Promoções</h3>
+                    <div class="carousel-actions">
+                        <button class="carousel-nav prev">◀</button>
+                        <button class="carousel-nav next">▶</button>
+                    </div>
+                </div>
+                <div class="carousel-track"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RODAPÉ -->
+    <footer class="main-footer" id="contato">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Pretinho Variedades</h4>
+                    <p>Sua loja de materiais escolares com os melhores preços!</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Atendimento</h4>
+                    <p>Segunda a Sexta: 8h - 18h</p>
+                    <p>Sábado: 8h - 12h</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p>📞 (83) 99851-1065</p>
+                    <p>📍 Rua 6 de Julho (Perto da Feira Livre de Nova Floresta)</p>
+                    <p>📱 <a href="https://www.instagram.com/pretinhovariedades/" target="_blank">Instagram: @pretinhovariedades</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Pretinho Variedades. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        window.API_BASE = localStorage.getItem('API_BASE') || window.location.origin;
+
+        // Menu Mobile Toggle com Animações
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const mainNav = document.getElementById('mainNav');
+            const navLinks = document.querySelectorAll('.nav-link');
+            let menuOpen = false;
+
+            const menuBackdrop = document.getElementById('menuBackdrop');
+
+            if (menuToggle && menuBackdrop) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mainNav.classList.toggle('active');
+                    menuBackdrop.classList.toggle('active');
+                    menuToggle.classList.toggle('active');
+                    menuOpen = !menuOpen;
+
+                    // Ripple effect no botão
+                    addRipple(menuToggle, e);
+                });
+
+                // Fechar menu ao clicar em um link
+                navLinks.forEach((link, index) => {
+                    link.addEventListener('click', function() {
+                        // Delay staggered para fechar
+                        setTimeout(() => {
+                            mainNav.classList.remove('active');
+                            menuToggle.classList.remove('active');
+                            menuBackdrop.classList.remove('active');
+                            menuOpen = false;
+                        }, 100 * (index + 1));
+                    });
+                });
+
+                // Fechar menu ao clicar fora
+                document.addEventListener('click', function(event) {
+                    if (menuOpen && !menuToggle.contains(event.target) && !mainNav.contains(event.target)) {
+                        mainNav.classList.remove('active');
+                        menuToggle.classList.remove('active');
+                        menuBackdrop.classList.remove('active');
+                        menuOpen = false;
+                    }
+                });
+
+                // Prevent menu close ao clicar no próprio menu
+                mainNav.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                // Fechar ao clicar no backdrop
+                menuBackdrop.addEventListener('click', function() {
+                    mainNav.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                    menuBackdrop.classList.remove('active');
+                    menuOpen = false;
+                });
+            }
+
+            // Ripple Effect Animation
+            function addRipple(element, event) {
+                const ripple = document.createElement('span');
+                const rect = element.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = event.clientX - rect.left - size / 2;
+                const y = event.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+
+                element.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            }
+
+            // Observar elementos com data-animate
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'slideInUp 0.6s ease-out forwards';
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('[data-animate]').forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+    <script src="js/notifications.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/home.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/search.js"></script>
+    <a href="#ofertas" class="floating-cta" aria-label="Ver ofertas">🛒 Comprar</a>
+    <script src="animations.js"></script>
+</body>
+</html>
+
+
+

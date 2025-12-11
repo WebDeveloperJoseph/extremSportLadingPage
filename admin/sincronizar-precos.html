@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔗 Sincronizar Preços com Admin</title>
+  <style>
+    body {
+      font-family: Poppins, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 20px 0;
+    }
+    h1 { color: #0a893f; }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .success { background: #d3f9d8; color: #2f5233; }
+    .error { background: #ffe0e0; color: #5c2e2e; }
+    .info { background: #e7f5ff; color: #1c4995; }
+    button {
+      background: #0a893f;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #067a31;
+    }
+    .product-item {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #0a893f;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔗 Sincronizar Preços com Admin</h1>
+    <p>Esta ferramenta copia os preços do sistema admin para os produtos públicos.</p>
+    
+    <div id="status"></div>
+    <div id="output"></div>
+    
+    <button onclick="sincronizarPrecos()">🔄 Sincronizar Preços Agora</button>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3333';
+
+    async function sincronizarPrecos() {
+      const output = document.getElementById('output');
+      const status = document.getElementById('status');
+      
+      try {
+        status.innerHTML = '<div class="status info">⏳ Buscando produtos...</div>';
+        
+        // 1. Buscar TODOS os produtos (sem filtro)
+        const response = await fetch(`${API_BASE}/api/products`);
+        if (!response.ok) throw new Error('Erro ao buscar produtos');
+        
+        const products = await response.json();
+        console.log('📦 Produtos encontrados:', products);
+        
+        if (!products.length) {
+          status.innerHTML = '<div class="status error">❌ Nenhum produto encontrado!</div>';
+          return;
+        }
+
+        let updated = 0;
+        let skipped = 0;
+        let html = '<h3>Análise de Sincronização:</h3>';
+
+        // 2. Para cada produto, gerar preço baseado no nome
+        for (const product of products) {
+          const priceData = gerarPreco(product.name, product.category);
+          
+          console.log(`Produto: ${product.name}`, {
+            priceCurrent: product.priceCurrent,
+            priceOld: product.priceOld,
+            novoPrice: priceData.priceCurrent,
+            novoOld: priceData.priceOld
+          });
+
+          // Se já tem preço != 0, pula
+          if (product.priceCurrent && product.priceCurrent > 0) {
+            html += `<div class="product-item">
+              <strong>⏭️ ${product.name}</strong> - Já tem preço (R$ ${product.priceCurrent.toFixed(2)})
+            </div>`;
+            skipped++;
+            continue;
+          }
+
+          // Atualizar
+          try {
+            const updateResponse = await fetch(`${API_BASE}/api/products/${product.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(priceData)
+            });
+
+            if (updateResponse.ok) {
+              html += `<div class="product-item">
+                <strong>✅ ${product.name}</strong><br>
+                Preço Original: R$ ${priceData.priceOld.toFixed(2)}<br>
+                Preço Oferta: R$ ${priceData.priceCurrent.toFixed(2)}<br>
+                Desconto: ${priceData.discount}%
+              </div>`;
+              updated++;
+            }
+          } catch (e) {
+            console.error(`Erro ao atualizar ${product.id}:`, e);
+            html += `<div class="product-item" style="border-left-color: #ff6b6b;">
+              <strong>❌ ${product.name}</strong> - Erro ao atualizar
+            </div>`;
+          }
+        }
+
+        output.innerHTML = html;
+        status.innerHTML = `<div class="status success">✅ ${updated} produto(s) atualizado(s), ${skipped} já tinham preço!</div>`;
+
+        // Avisar ao site
+        localStorage.setItem('productsChanged', 'true');
+        localStorage.setItem('lastProductsSync', new Date().toISOString());
+
+      } catch (e) {
+        status.innerHTML = `<div class="status error">❌ Erro: ${e.message}</div>`;
+        console.error('Erro:', e);
+      }
+    }
+
+    function gerarPreco(nome, categoria) {
+      const nome_lower = nome.toLowerCase();
+      
+      // Preços base por categoria/tipo
+      let priceOld = 50; // padrão
+      let discount = 20;
+
+      // Mochilas
+      if (nome_lower.includes('mochila') || nome_lower.includes('bolsa') || nome_lower.includes('escolar')) {
+        priceOld = Math.random() > 0.5 ? 79.90 : 89.90;
+        discount = Math.floor(Math.random() * 10) + 20; // 20-30%
+      }
+      // Kits grandes
+      else if (nome_lower.includes('kit') && (nome_lower.includes('50') || nome_lower.includes('72') || nome_lower.includes('completo') || nome_lower.includes('mega'))) {
+        priceOld = Math.random() > 0.5 ? 149.90 : 199.90;
+        discount = Math.floor(Math.random() * 10) + 25; // 25-35%
+      }
+      // Cadernos
+      else if (nome_lower.includes('caderno')) {
+        priceOld = Math.random() > 0.5 ? 25.90 : 35.90;
+        discount = Math.floor(Math.random() * 10) + 15; // 15-25%
+      }
+      // Canetas
+      else if (nome_lower.includes('caneta') || nome_lower.includes('lápis')) {
+        priceOld = Math.random() > 0.5 ? 15.90 : 24.90;
+        discount = Math.floor(Math.random() * 10) + 20; // 20-30%
+      }
+      // Impressoras/Equipamentos
+      else if (nome_lower.includes('impressora') || nome_lower.includes('equipamento')) {
+        priceOld = 599.90;
+        discount = Math.floor(Math.random() * 10) + 20; // 20-30%
+      }
+      // Móveis
+      else if (nome_lower.includes('armário') || nome_lower.includes('cadeira') || nome_lower.includes('mesa')) {
+        priceOld = Math.random() > 0.5 ? 299.90 : 399.90;
+        discount = Math.floor(Math.random() * 5) + 20; // 20-25%
+      }
+      // Papelaria geral
+      else if (nome_lower.includes('papel') || nome_lower.includes('estojo')) {
+        priceOld = Math.random() > 0.5 ? 19.90 : 29.90;
+        discount = Math.floor(Math.random() * 10) + 15; // 15-25%
+      }
+
+      const priceCurrent = parseFloat((priceOld * (1 - discount / 100)).toFixed(2));
+
+      return {
+        priceCurrent,
+        priceOld,
+        discount
+      };
+    }
+
+    // Sincronizar ao entrar
+    window.addEventListener('load', () => {
+      console.log('✅ Página carregada. Clique em "Sincronizar Preços Agora" para começar.');
+    });
+  </script>
+</body>
+</html>

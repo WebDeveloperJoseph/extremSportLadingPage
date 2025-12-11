@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Admin</title>
+    <link rel="stylesheet" href="admin-modern.css">
+</head>
+<body class="admin-body">
+
+    <!-- SIDEBAR ADMIN -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>🛒 Admin Panel</h2>
+            <p>Pretinho Variedades</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="produtos.html">📦 Produtos</a></li>
+                <li><a href="pedidos.html">🛍️ Pedidos</a></li>
+                <li><a href="categorias.html">📁 Categorias</a></li>
+                <li><a href="banners.html">🖼️ Banners</a></li>
+                <li><a href="destaques.html">⭐ Destaques</a></li>
+                <li><a href="promocoes.html">🎉 Promoções</a></li>
+                <li><a href="configuracoes.html" class="active">⚙️ Configurações</a></li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="../public/index.html" target="_blank" class="btn-view-site">🌐 Ver Site</a>
+            <button id="logoutBtn" class="btn-logout">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="admin-main">
+        <!-- TOPBAR -->
+        <header class="admin-topbar">
+            <div class="topbar-left">
+                <h1>Configurações da Loja</h1>
+            </div>
+        </header>
+
+        <!-- CONTEÚDO -->
+        <div class="admin-content">
+            <!-- HERO DA HOME -->
+            <div class="settings-section">
+                <h2 class="section-title">🖼️ Hero da Home</h2>
+                <div class="settings-card">
+                    <div class="form-group">
+                        <label>Imagem do Hero (URL)</label>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <input type="text" id="heroImageUrl" placeholder="Cole a URL ou envie um arquivo">
+                            <input type="file" id="heroImageFile" accept="image/*">
+                            <button type="button" id="btnUploadHero" class="btn-primary">Enviar Arquivo</button>
+                            <button type="button" id="btnSaveHero" class="btn-save">Salvar Hero</button>
+                        </div>
+                    </div>
+                    <div style="margin-top:10px;">
+                        <div>Pré-visualização:</div>
+                        <div id="heroPreview" style="height:160px; border-radius:10px; overflow:hidden; background:#f1f1f1; background-size:cover; background-position:center;"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- INFORMAÇÕES DA LOJA -->
+            <div class="settings-section">
+                <h2 class="section-title">🏪 Informações da Loja</h2>
+                <div class="settings-card">
+                    <form id="storeInfoForm">
+                        <div class="form-group">
+                            <label for="storeName">Nome da Loja</label>
+                            <input type="text" id="storeName" value="Pretinho Variedades">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="storeEmail">E-mail</label>
+                            <input type="email" id="storeEmail" value="contato@pretinhovariedades.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="storePhone">Telefone</label>
+                            <input type="tel" id="storePhone" value="(00) 0000-0000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="storeAddress">Endereço</label>
+                            <textarea id="storeAddress" rows="3">Rua Exemplo, 123 - Centro - Cidade/UF</textarea>
+                        </div>
+
+                        <button type="button" onclick="saveSettings()" class="btn-save">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- CONFIGURAÇÃO DE FRETE -->
+            <div class="settings-section">
+                <h2 class="section-title">📦 Configuração de Frete</h2>
+                <div class="settings-card">
+                    <form id="shippingForm">
+                        <div class="form-group">
+                            <label for="shippingEnabled">
+                                <input type="checkbox" id="shippingEnabled">
+                                Ativar Frete
+                            </label>
+                        </div>
+
+                        <div id="shippingOptions" style="display:none; margin-top:20px;">
+                            <div class="form-group">
+                                <label for="shippingType">Tipo de Frete</label>
+                                <select id="shippingType">
+                                    <option value="fixed">Valor Fixo</option>
+                                    <option value="free">Grátis</option>
+                                    <option value="progressive">Progressivo (por valor)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="fixedShippingGroup">
+                                <label for="shippingValue">Valor do Frete (R$)</label>
+                                <input type="number" id="shippingValue" placeholder="0.00" step="0.01" min="0">
+                            </div>
+
+                            <div class="form-group" id="progressiveShippingGroup" style="display:none;">
+                                <label for="progressiveValueBase">Valor Base para Frete Grátis (R$)</label>
+                                <input type="number" id="progressiveValueBase" placeholder="100.00" step="0.01" min="0">
+                                <p style="font-size:12px; color:#666; margin-top:5px;">Pedidos acima deste valor terão frete grátis</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="shippingInfo">Informação sobre Frete (exibida ao cliente)</label>
+                                <textarea id="shippingInfo" rows="3" placeholder="Ex: Frete grátis para compras acima de R$ 100">Entrega em até 5 dias úteis</textarea>
+                            </div>
+
+                            <button type="button" onclick="saveShippingSettings()" class="btn-save">Salvar Configuração de Frete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- GERENCIAMENTO DE DADOS -->
+            <div class="settings-section">
+                <h2 class="section-title">💾 Gerenciamento de Dados</h2>
+                <div class="settings-card">
+                    <div class="data-management">
+                        <div class="data-item">
+                            <div>
+                                <h3>Exportar Dados</h3>
+                                <p>Faça backup de todos os produtos e pedidos</p>
+                            </div>
+                            <button onclick="exportData()" class="btn-primary">📥 Exportar</button>
+                        </div>
+
+                        <div class="data-item">
+                            <div>
+                                <h3>Importar Dados</h3>
+                                <p>Restaurar dados de um backup</p>
+                            </div>
+                            <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                            <button onclick="document.getElementById('importFile').click()" class="btn-primary">📤 Importar</button>
+                        </div>
+
+                        <div class="data-item danger">
+                            <div>
+                                <h3>Limpar Todos os Dados</h3>
+                                <p>⚠️ Esta ação não pode ser desfeita!</p>
+                            </div>
+                            <button onclick="clearAllData()" class="btn-delete">🗑️ Limpar Tudo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CUPONS DE DESCONTO -->
+            <div class="settings-section">
+                <h2 class="section-title">🎫 Cupons de Desconto Ativos</h2>
+                <div class="settings-card">
+                    <table class="coupon-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Desconto</th>
+                                <th>Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>DESCONTO10</code></td>
+                                <td>10%</td>
+                                <td>Desconto de 10% em toda a loja</td>
+                            </tr>
+                            <tr>
+                                <td><code>PROMO20</code></td>
+                                <td>20%</td>
+                                <td>Promoção especial de 20%</td>
+                            </tr>
+                            <tr>
+                                <td><code>VOLTAAS</code></td>
+                                <td>15%</td>
+                                <td>Especial volta às aulas</td>
+                            </tr>
+                            <tr>
+                                <td><code>PRIMEIRA</code></td>
+                                <td>25%</td>
+                                <td>Primeira compra - 25% off</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">
+                        💡 Para editar cupons, modifique o arquivo <code>js/cart.js</code>
+                    </p>
+                </div>
+            </div>
+
+            <!-- SOBRE O SISTEMA -->
+            <div class="settings-section">
+                <h2 class="section-title">ℹ️ Sobre o Sistema</h2>
+                <div class="settings-card">
+                    <div style="line-height: 2;">
+                        <p><strong>Sistema:</strong> Pretinho Variedades Admin</p>
+                        <p><strong>Versão:</strong> 1.0.0</p>
+                        <p><strong>Desenvolvido em:</strong> Dezembro 2025</p>
+                        <p><strong>Armazenamento:</strong> LocalStorage (navegador)</p>
+                        <p style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; color: #856404;">
+                            ⚠️ <strong>Importante:</strong> Este é um sistema de demonstração. Para uso em produção, implemente um backend seguro com banco de dados.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/admin-configuracoes.js"></script>
+    <script>
+        // Autenticação
+        if (sessionStorage.getItem('adminLoggedIn') !== 'true' && 
+            localStorage.getItem('adminRemember') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // Logout (mantido também no admin-configuracoes.js)
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sessionStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminRemember');
+            window.location.href = 'login.html';
+        });
+
+        function saveSettings() {
+            const settings = {
+                storeName: document.getElementById('storeName').value,
+                storeEmail: document.getElementById('storeEmail').value,
+                storePhone: document.getElementById('storePhone').value,
+                storeAddress: document.getElementById('storeAddress').value
+            };
+
+            localStorage.setItem('storeSettings', JSON.stringify(settings));
+            showNotification('✅ Configurações salvas com sucesso!', 'success');
+        }
+
+        function exportData() {
+            const data = {
+                products: JSON.parse(localStorage.getItem('products') || '[]'),
+                orders: JSON.parse(localStorage.getItem('orders') || '[]'),
+                settings: JSON.parse(localStorage.getItem('storeSettings') || '{}'),
+                exportDate: new Date().toISOString()
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pretinho-backup-${Date.now()}.json`;
+            a.click();
+            
+            showNotification('✅ Dados exportados com sucesso!', 'success');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.products) localStorage.setItem('products', JSON.stringify(data.products));
+                    if (data.orders) localStorage.setItem('orders', JSON.stringify(data.orders));
+                    if (data.settings) localStorage.setItem('storeSettings', JSON.stringify(data.settings));
+                    
+                    showNotification('✅ Dados importados com sucesso! Recarregando...', 'success');
+                    setTimeout(() => location.reload(), 1500);
+                } catch (error) {
+                    showNotification('❌ Erro ao importar dados! Arquivo inválido.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (!confirm('⚠️ ATENÇÃO! Esta ação irá apagar TODOS os dados (produtos, pedidos, configurações).\n\nDeseja continuar?')) {
+                return;
+            }
+
+            if (!confirm('Tem CERTEZA ABSOLUTA? Esta ação não pode ser desfeita!')) {
+                return;
+            }
+
+            localStorage.removeItem('products');
+            localStorage.removeItem('orders');
+            localStorage.removeItem('cart');
+            localStorage.removeItem('storeSettings');
+            localStorage.removeItem('shippingCost');
+            localStorage.removeItem('discountAmount');
+            localStorage.removeItem('appliedCoupon');
+
+            showNotification('🗑️ Todos os dados foram apagados! Recarregando...', 'info');
+            setTimeout(() => location.reload(), 1500);
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        window.saveSettings = saveSettings;
+        window.exportData = exportData;
+        window.importData = importData;
+        window.clearAllData = clearAllData;
+    </script>
+
+    <style>
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .data-management {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #98D447;
+        }
+
+        .data-item.danger {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .data-item h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .data-item p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .coupon-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .coupon-table th,
+        .coupon-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .coupon-table th {
+            background: #f4f4f4;
+            font-weight: 600;
+        }
+
+        .coupon-table code {
+            background: #fff3cd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #856404;
+        }
+    </style>
+
+    <script src="../js/notifications.js"></script>
+    <script src="js/admin-configuracoes.js"></script>
+    <script src="js/admin-shipping.js"></script>
+</body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Completo - Mercado Pretinho</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: Poppins, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .test-card {
+      background: #f9f9f9;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+    .test-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+    .test-card h3 {
+      margin: 0 0 10px 0;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .test-card p {
+      margin: 0 0 15px 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .test-card button {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .test-card button:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .status.pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .log {
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 15px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: #333;
+    }
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .btn {
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #764ba2;
+    }
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🧪 Teste Completo do Sistema</h1>
+
+  <div class="test-grid">
+    
+    <!-- Teste: Servidor -->
+    <div class="test-card">
+      <h3>🔌 Servidor</h3>
+      <p>Verifica se o servidor Express está rodando</p>
+      <button onclick="testServer()">Testar Conexão</button>
+      <div id="server-status"></div>
+      <div id="server-log" class="log" style="display:none;"></div>
+    </div>
+
+    <!-- Teste: Produtos -->
+    <div class="test-card">
+      <h3>📦 Produtos</h3>
+      <p>Verifica listagem de produtos</p>
+      <button onclick="testProducts()">Testar API</button>
+      <div id="products-status"></div>
+      <div id="products-log" class="log" style="display:none;"></div>
+    </div>
+
+    <!-- Teste: Banners -->
+    <div class="test-card">
+      <h3>🖼️ Banners</h3>
+      <p>Verifica listagem de banners</p>
+      <button onclick="testBanners()">Testar API</button>
+      <div id="banners-status"></div>
+      <div id="banners-log" class="log" style="display:none;"></div>
+    </div>
+
+    <!-- Teste: Destaques -->
+    <div class="test-card">
+      <h3>⭐ Destaques</h3>
+      <p>Verifica grupos de produtos em destaque</p>
+      <button onclick="testFeatured()">Testar API</button>
+      <div id="featured-status"></div>
+      <div id="featured-log" class="log" style="display:none;"></div>
+    </div>
+
+    <!-- Teste: Homepage -->
+    <div class="test-card">
+      <h3>🌐 Homepage</h3>
+      <p>Abre a página pública principal</p>
+      <button onclick="window.open('index.html', '_blank')">Abrir Homepage</button>
+    </div>
+
+    <!-- Teste: Admin -->
+    <div class="test-card">
+      <h3>👨‍💼 Admin Panel</h3>
+      <p>Abre o painel de administração</p>
+      <button onclick="window.open('admin/dashboard.html', '_blank')">Abrir Admin</button>
+    </div>
+
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn btn-primary" onclick="runAllTests()">▶️ Executar Todos os Testes</button>
+    <button class="btn btn-secondary" onclick="clearAllLogs()">🗑️ Limpar Logs</button>
+  </div>
+
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:3333';
+
+  function setStatus(id, text, type) {
+    const el = document.getElementById(id);
+    el.innerHTML = `<div class="status ${type}">${text}</div>`;
+  }
+
+  function setLog(id, text) {
+    const el = document.getElementById(id);
+    if (text) {
+      el.style.display = 'block';
+      el.textContent = text;
+    } else {
+      el.style.display = 'none';
+    }
+  }
+
+  async function testServer() {
+    try {
+      const resp = await fetch(`${API_BASE}/api/health`);
+      if (resp.ok) {
+        setStatus('server-status', '✅ Servidor online', 'success');
+        setLog('server-log', `Resposta: ${resp.status} ${resp.statusText}`);
+      } else {
+        setStatus('server-status', '❌ Servidor respondeu com erro', 'error');
+        setLog('server-log', `Erro HTTP: ${resp.status}`);
+      }
+    } catch (e) {
+      setStatus('server-status', '❌ Servidor offline', 'error');
+      setLog('server-log', `Erro: ${e.message}\n\nCertifique-se que o servidor está rodando em ${API_BASE}`);
+    }
+  }
+
+  async function testProducts() {
+    try {
+      const resp = await fetch(`${API_BASE}/api/products`);
+      if (resp.ok) {
+        const data = await resp.json();
+        const count = data.length;
+        const active = data.filter(p => p.active).length;
+        setStatus('products-status', `✅ ${count} produtos (${active} ativos)`, 'success');
+        setLog('products-log', JSON.stringify(data.slice(0, 2), null, 2) + '\n...');
+      } else {
+        setStatus('products-status', '❌ Erro ao listar', 'error');
+        setLog('products-log', `HTTP ${resp.status}`);
+      }
+    } catch (e) {
+      setStatus('products-status', '❌ Erro de conexão', 'error');
+      setLog('products-log', e.message);
+    }
+  }
+
+  async function testBanners() {
+    try {
+      const resp = await fetch(`${API_BASE}/api/banners`);
+      if (resp.ok) {
+        const data = await resp.json();
+        const count = data.length;
+        const active = data.filter(b => b.active).length;
+        setStatus('banners-status', `✅ ${count} banners (${active} ativos)`, 'success');
+        setLog('banners-log', JSON.stringify(data.slice(0, 2), null, 2) + '\n...');
+      } else {
+        setStatus('banners-status', '❌ Erro ao listar', 'error');
+        setLog('banners-log', `HTTP ${resp.status}`);
+      }
+    } catch (e) {
+      setStatus('banners-status', '❌ Erro de conexão', 'error');
+      setLog('banners-log', e.message);
+    }
+  }
+
+  async function testFeatured() {
+    try {
+      const resp = await fetch(`${API_BASE}/api/featured-groups`);
+      if (resp.ok) {
+        const data = await resp.json();
+        setStatus('featured-status', '✅ Grupos carregados', 'success');
+        setLog('featured-log', JSON.stringify(data, null, 2));
+      } else {
+        setStatus('featured-status', '❌ Erro ao listar', 'error');
+        setLog('featured-log', `HTTP ${resp.status}`);
+      }
+    } catch (e) {
+      setStatus('featured-status', '❌ Erro de conexão', 'error');
+      setLog('featured-log', e.message);
+    }
+  }
+
+  async function runAllTests() {
+    console.log('Executando todos os testes...');
+    await testServer();
+    setTimeout(() => testProducts(), 500);
+    setTimeout(() => testBanners(), 1000);
+    setTimeout(() => testFeatured(), 1500);
+  }
+
+  function clearAllLogs() {
+    document.querySelectorAll('.log').forEach(el => {
+      el.style.display = 'none';
+      el.textContent = '';
+    });
+    document.querySelectorAll('.status').forEach(el => {
+      el.textContent = '';
+    });
+  }
+
+  // Auto-testar ao carregar
+  window.addEventListener('load', () => {
+    console.log('Página de testes carregada');
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Categorias - Admin</title>
+    <link rel="stylesheet" href="admin-modern.css">
+</head>
+<body class="admin-body">
+
+    <!-- SIDEBAR ADMIN -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>🛒 Admin Panel</h2>
+            <p>Pretinho Variedades</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="produtos.html">📦 Produtos</a></li>
+                <li><a href="pedidos.html">🛍️ Pedidos</a></li>
+                <li><a href="categorias.html" class="active">📁 Categorias</a></li>
+                <li><a href="banners.html">🖼️ Banners</a></li>
+                <li><a href="destaques.html">⭐ Destaques</a></li>
+                <li><a href="promocoes.html">🎉 Promoções</a></li>
+                <li><a href="configuracoes.html">⚙️ Configurações</a></li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="../public/index.html" target="_blank" class="btn-view-site">🌐 Ver Site</a>
+            <button id="logoutBtn" class="btn-logout">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="admin-main">
+        <!-- TOPBAR -->
+        <header class="admin-topbar">
+            <div class="topbar-left">
+                <h1>Gerenciar Categorias</h1>
+            </div>
+            <div class="topbar-right">
+                <button id="btnAddCategory" class="btn-primary">➕ Nova Categoria</button>
+            </div>
+        </header>
+
+        <!-- CONTEÚDO -->
+        <div class="admin-content">
+            <div class="categories-grid">
+                <div class="category-card">
+                    <div class="category-icon">🎒</div>
+                    <h3>Mochilas</h3>
+                    <p class="category-count" id="count-mochilas">0 produtos</p>
+                    <div class="category-actions">
+                        <button class="btn-edit" onclick="editCategory('mochilas')">✏️ Editar</button>
+                    </div>
+                </div>
+
+                <div class="category-card">
+                    <div class="category-icon">✏️</div>
+                    <h3>Canetas</h3>
+                    <p class="category-count" id="count-canetas">0 produtos</p>
+                    <div class="category-actions">
+                        <button class="btn-edit" onclick="editCategory('canetas')">✏️ Editar</button>
+                    </div>
+                </div>
+
+                <div class="category-card">
+                    <div class="category-icon">📓</div>
+                    <h3>Cadernos</h3>
+                    <p class="category-count" id="count-cadernos">0 produtos</p>
+                    <div class="category-actions">
+                        <button class="btn-edit" onclick="editCategory('cadernos')">✏️ Editar</button>
+                    </div>
+                </div>
+
+                <div class="category-card">
+                    <div class="category-icon">📦</div>
+                    <h3>Estojos</h3>
+                    <p class="category-count" id="count-estojos">0 produtos</p>
+                    <div class="category-actions">
+                        <button class="btn-edit" onclick="editCategory('estojos')">✏️ Editar</button>
+                    </div>
+                </div>
+
+                <div class="category-card">
+                    <div class="category-icon">📚</div>
+                    <h3>Outros</h3>
+                    <p class="category-count" id="count-outros">0 produtos</p>
+                    <div class="category-actions">
+                        <button class="btn-edit" onclick="editCategory('outros')">✏️ Editar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h2 style="margin-bottom: 20px; color: #333;">ℹ️ Informações sobre Categorias</h2>
+                <p style="color: #666; line-height: 1.8; margin-bottom: 15px;">
+                    As categorias são usadas para organizar os produtos da loja. Cada produto deve pertencer a uma categoria.
+                </p>
+                <p style="color: #666; line-height: 1.8;">
+                    <strong>Categorias Padrão:</strong> Mochilas, Canetas, Cadernos, Estojos e Outros. 
+                    Para personalizar, edite o código em <code>js/admin-categorias.js</code>.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Autenticação
+        if (sessionStorage.getItem('adminLoggedIn') !== 'true' && 
+            localStorage.getItem('adminRemember') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            sessionStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminRemember');
+            window.location.href = 'login.html';
+        });
+
+        // Carregar contagens
+        function loadCategoryCounts() {
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            
+            const counts = {
+                mochilas: 0,
+                canetas: 0,
+                cadernos: 0,
+                estojos: 0,
+                outros: 0
+            };
+
+            products.forEach(product => {
+                if (counts.hasOwnProperty(product.category)) {
+                    counts[product.category]++;
+                }
+            });
+
+            Object.keys(counts).forEach(category => {
+                const el = document.getElementById(`count-${category}`);
+                if (el) el.textContent = `${counts[category]} produto(s)`;
+            });
+        }
+
+        function editCategory(category) {
+            alert(`Funcionalidade de edição de categoria "${category}" em desenvolvimento.\n\nVocê pode adicionar ícones personalizados e descrições no código.`);
+        }
+
+        loadCategoryCounts();
+
+        window.editCategory = editCategory;
+    </script>
+
+    <style>
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .category-card h3 {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .category-count {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</body>
+</html>

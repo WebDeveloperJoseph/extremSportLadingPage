@@ -1,0 +1,213 @@
+📺 BANNERS - GUIA DE USO
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 OBJETIVO:
+Gerenciar banners promocionais que aparecem no carousel do topo da homepage
+
+───────────────────────────────────────────────────────────────────────────────
+
+📍 2 FORMAS DE ACESSAR:
+
+1️⃣ VERSÃO SIMPLES (Original)
+   http://localhost:3333/admin/banners.html
+   ✓ Modal para editar
+   ✓ Preview em tempo real
+   ✓ Edição rápida
+
+2️⃣ VERSÃO AVANÇADA (Nova - RECOMENDADA)
+   http://localhost:3333/admin/banners-avancado.html
+   ✓ Editor split-screen (left/right)
+   ✓ Preview ao vivo enquanto digita
+   ✓ Upload de imagens com duplo clique
+   ✓ Lista interativa de banners
+   ✓ Melhor visualização
+   ✓ Interface mais intuitiva
+
+───────────────────────────────────────────────────────────────────────────────
+
+🚀 COMO CRIAR UM BANNER (Versão Avançada):
+
+1. Abra: http://localhost:3333/admin/banners-avancado.html
+
+2. No painel da ESQUERDA (✏️ Editor), preencha:
+   
+   📷 IMAGEM:
+      • Cole URL de uma imagem (16:9 é ideal)
+      • OU duplo clique para fazer upload
+      • Recomendado: 1920x1080 ou 1280x720
+   
+   📝 TÍTULO:
+      • Texto principal do banner
+      • Ex: "MEGA PROMOÇÃO"
+   
+   📄 SUBTÍTULO:
+      • Texto secundário (opcional)
+      • Ex: "Até 70% de desconto!"
+   
+   🔗 LINK:
+      • Para seção: #ofertas
+      • Para URL: https://...
+      • Deixe vazio se não quiser botão
+   
+   🔢 ORDEM:
+      • 1 = primeiro banner
+      • 2 = segundo banner
+      • Números menores aparecem primeiro
+   
+   ✓ STATUS:
+      • Ativo = aparece na homepage
+      • Inativo = não aparece (mas fica salvo)
+
+3. Veja o PREVIEW em TEMPO REAL no painel da DIREITA (📺 Preview)
+
+4. Clique "💾 Salvar"
+
+5. ✅ Banner aparece IMEDIATAMENTE no carousel da homepage!
+
+───────────────────────────────────────────────────────────────────────────────
+
+💡 DICAS IMPORTANTES:
+
+✨ UPLOAD DE IMAGEM RÁPIDO:
+   • Duplo clique no campo "Imagem"
+   • Selecione arquivo do seu PC
+   • Será enviado automaticamente
+   • Muito mais rápido que copiar URL!
+
+🔄 EDITAR BANNER:
+   • Clique em um banner na lista
+   • Modifique no editor
+   • Veja mudanças em tempo real
+   • Clique "Salvar"
+
+🗑️ DELETAR BANNER:
+   • Liste de banners no final
+   • Clique "Excluir" no banner
+   • Confirme
+
+🆕 CRIAR NOVO:
+   • Clique "➕ Novo"
+   • Formulário limpa
+   • Preencha dados
+   • Clique "Salvar"
+
+───────────────────────────────────────────────────────────────────────────────
+
+📺 PREVIEW EM TEMPO REAL:
+
+O que você vê no painel de PREVIEW é EXATAMENTE como aparecerá na homepage!
+
+• Enquanto digita o título → muda no preview
+• Enquanto digita subtítulo → muda no preview
+• Enquanto seleciona imagem → atualiza preview
+• Enquanto muda link → botão aparece/desaparece
+
+Perfeito para garantir que fica bonito antes de salvar!
+
+───────────────────────────────────────────────────────────────────────────────
+
+🎬 COMO OS BANNERS APARECEM NA HOMEPAGE:
+
+Homepage (index.html):
+┌─────────────────────────────────────────────┐
+│        BANNER CAROUSEL (TOPO)               │
+│                                             │
+│  [Imagem com sobreposição]                 │
+│                                             │
+│  Título                                     │
+│  Subtítulo                                  │
+│  [Botão: Ver mais]  ← se houver link        │
+│                                             │
+│              ◀    ▶  (navegação)           │
+└─────────────────────────────────────────────┘
+
+• Auto-rotate a cada 5 segundos
+• Clique nas setas para navegar manualmente
+• Ordem definida no admin
+
+───────────────────────────────────────────────────────────────────────────────
+
+🖼️ TAMANHOS RECOMENDADOS DE IMAGEM:
+
+Full HD:     1920 x 1080
+HD:          1280 x 720
+Quadrado:    1000 x 1000
+Mobile:      540 x 960
+
+Proporção ideal: 16:9 (landscape)
+
+Formatos: PNG, JPG, WebP
+
+───────────────────────────────────────────────────────────────────────────────
+
+🔗 TIPOS DE LINKS:
+
+1. ÂNCORA (vai para seção da mesma página):
+   #ofertas
+   #categorias
+   #contato
+
+2. URL EXTERNA (vai para outro site):
+   https://seu-site.com
+   https://instagram.com
+
+3. SEM LINK:
+   Deixe vazio → não terá botão
+
+───────────────────────────────────────────────────────────────────────────────
+
+📊 EXEMPLO PRÁTICO:
+
+Banner 1:
+  Imagem: https://images.unsplash.com/photo-...
+  Título: "VOLTA ÀS AULAS"
+  Subtítulo: "Descontos de até 50%"
+  Link: #ofertas
+  Ordem: 1
+  Status: Ativo
+
+Resultado na Homepage:
+┌────────────────────────────────┐
+│ [Imagem de volta às aulas]     │
+│ VOLTA ÀS AULAS                │
+│ Descontos de até 50%          │
+│ [Botão: Ver mais] ──→ #ofertas │
+└────────────────────────────────┘
+
+───────────────────────────────────────────────────────────────────────────────
+
+❓ PERGUNTAS FREQUENTES:
+
+P: Por quanto tempo os banners aparecem?
+R: Cada slide fica 5 segundos. Depois passa para o próximo automaticamente.
+
+P: Posso reordenar banners depois?
+R: Sim! Edite o numero de "Ordem" e clique "Salvar"
+
+P: E se deixar imagem vazia?
+R: O banner não aparecerá. Imagem é obrigatória.
+
+P: Posso ter banners inativos?
+R: Sim! Marque como "Inativo" para salvar mas não exibir.
+
+P: Os banners aparecem na mobile?
+R: Sim! E respondem bem ao tamanho da tela.
+
+P: Quanto tempo leva para aparecer na homepage?
+R: Imediato! Não precisa recarregar a página.
+
+───────────────────────────────────────────────────────────────────────────────
+
+🎯 PRÓXIMOS PASSOS:
+
+1. Acesse: http://localhost:3333/admin/banners-avancado.html
+2. Crie seu primeiro banner
+3. Veja no preview
+4. Clique "Salvar"
+5. Abra http://localhost:3333/index.html
+6. Veja seu banner aparecer no topo! 🎉
+
+───────────────────────────────────────────────────────────────────────────────
+
+✨ Seu sistema de banners está pronto para uso!
