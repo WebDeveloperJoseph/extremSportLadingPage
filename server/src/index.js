@@ -35,6 +35,13 @@ console.log('📦 Inicializando banco de dados...');
 try {
   initDb();
   console.log('✅ Banco de dados inicializado');
+  
+  // Executa migração para limpar banners duplicados
+  import('./migrations/clean-banners.js')
+    .then(module => module.default())
+    .catch(err => {
+      console.error('⚠️  Aviso: Erro ao executar migração de banners:', err.message);
+    });
 } catch(err) {
   console.error('❌ Erro ao inicializar BD:', err);
 }
