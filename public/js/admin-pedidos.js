@@ -48,7 +48,7 @@ function loadOrders() {
 
 async function loadOrdersFromBackend() {
     try {
-        const API_BASE = window.API_BASE || localStorage.getItem('API_BASE') || window.location.origin;
+        const API_BASE = window.API_BASE || localStorage.getItem('API_BASE') || (window.location.origin.includes('vercel') || window.location.origin.includes('localhost') ? 'https://extremsportladingpage-production.up.railway.app' : window.location.origin);
         console.log(`🔌 Carregando pedidos do backend: ${API_BASE}/api/orders`);
         
         const response = await fetch(`${API_BASE}/api/orders`);

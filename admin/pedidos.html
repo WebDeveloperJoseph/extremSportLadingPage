@@ -111,7 +111,7 @@
     </div>
 
     <script>
-        window.API_BASE = localStorage.getItem('API_BASE') || window.location.origin;
+        window.API_BASE = localStorage.getItem('API_BASE') || (window.location.origin.includes('vercel') || window.location.origin.includes('localhost') ? 'https://extremsportladingpage-production.up.railway.app' : window.location.origin);
     </script>
     <script src="../public/js/admin-pedidos.js"></script>
 </body>

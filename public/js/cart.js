@@ -1,5 +1,5 @@
 // Sistema Completo do Carrinho de Compras
-const API_BASE = localStorage.getItem('API_BASE') || window.location.origin;
+const API_BASE = localStorage.getItem('API_BASE') || (window.location.origin.includes('vercel') || window.location.origin.includes('localhost') ? 'https://extremsportladingpage-production.up.railway.app' : window.location.origin);
 let cart = [];
 let listenersAttached = false;
 
@@ -105,9 +105,9 @@ function renderCart() {
         return;
     }
 
-    const API_BASE = localStorage.getItem('API_BASE') || window.location.origin;
+    const API_BASE_INTERNAL = localStorage.getItem('API_BASE') || (window.location.origin.includes('vercel') || window.location.origin.includes('localhost') ? 'https://extremsportladingpage-production.up.railway.app' : window.location.origin);
     const productsHtml = cart.map(item => {
-        const imgSrc = item.image?.startsWith('http') ? item.image : `${API_BASE}${item.image}`;
+        const imgSrc = item.image?.startsWith('http') ? item.image : `${API_BASE_INTERNAL}${item.image}`;
         return `
         <div class="cart-item" data-product-id="${item.id}">
             <div class="col-product">
@@ -327,7 +327,7 @@ function checkout() {
 // Salvar pedido no backend
 async function saveOrderToBackend(order) {
     try {
-        const API_BASE = window.API_BASE || 'http://localhost:3333';
+        const API_BASE = window.API_BASE || localStorage.getItem('API_BASE') || (window.location.origin.includes('vercel') || window.location.origin.includes('localhost') ? 'https://extremsportladingpage-production.up.railway.app' : window.location.origin);
         
         console.log(`🌐 [BACKEND] Enviando pedido para: ${API_BASE}/api/orders`);
         

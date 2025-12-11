@@ -621,6 +621,7 @@ img {
     background-position: center;
     background-attachment: fixed; /* 🎯 Parallax effect */
     animation: zoomInSlow 1.2s ease-out; /* 🎯 Animação de entrada */
+    background-color: rgba(255, 255, 255, 0.1); /* Fallback se imagem não carregar */
 }
 
 @keyframes zoomInSlow {

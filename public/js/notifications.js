@@ -141,7 +141,7 @@ window.notify = notify;
 
 // Sistema de verificação de conectividade
 async function checkServerConnection() {
-    const API_BASE = localStorage.getItem('API_BASE') || window.location.origin;
+    const API_BASE = localStorage.getItem('API_BASE') || (window.location.origin.includes('vercel') || window.location.origin.includes('localhost') ? 'https://extremsportladingpage-production.up.railway.app' : window.location.origin);
     
     try {
         const resp = await fetch(`${API_BASE}/api/health`, {
