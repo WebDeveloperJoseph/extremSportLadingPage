@@ -1,10 +1,9 @@
-{
-  "git": {
-    "deploymentEnabled": {
-      "main": true
-    }
-  },
-  "buildCommand": null,
-  "outputDirectory": "public",
-  "installCommand": null
-}
+server/
+node_modules/
+.git/
+*.md
+*.txt
+deploy/
+adicionar-equipe.js
+static-server.js
+start-all.bat
