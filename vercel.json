@@ -1,0 +1,23 @@
+{
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/", "destination": "/admin/index.html" },
+    { "source": "/admin/login", "destination": "/admin/login.html" },
+    { "source": "/admin/produtos", "destination": "/admin/produtos.html" },
+    { "source": "/admin/pedidos", "destination": "/admin/pedidos.html" },
+    { "source": "/admin/banners", "destination": "/admin/banners.html" },
+    { "source": "/admin/destaques", "destination": "/admin/destaques.html" },
+    { "source": "/admin/configuracoes", "destination": "/admin/configuracoes.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
