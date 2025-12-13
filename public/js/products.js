@@ -127,7 +127,18 @@ function renderPublicProducts(products) {
     console.log('📊 Primeiros 3 produtos COMPLETOS:', products.slice(0, 3)); // DEBUG
     
     productsGrid.innerHTML = products.map((product, index) => {
-        const imageUrl = product.image?.startsWith('http') ? product.image : API_BASE + product.image;
+        const fallbackImage = '/assets/img/img_exemplo.png';
+        let imageUrl = fallbackImage;
+
+        if (product.image) {
+            if (product.image.startsWith('http')) {
+                // Garante https para evitar mixed content
+                imageUrl = product.image.replace('http://', 'https://');
+            } else {
+                const normalizedPath = product.image.startsWith('/') ? product.image : `/${product.image}`;
+                imageUrl = `${API_BASE}${normalizedPath}`;
+            }
+        }
         
         // 🔍 DEBUG DETALHADO - Mostrar TODOS os campos de preço
         console.log(`🔍 [${index}] ${product.name}:`, {
@@ -149,7 +160,7 @@ function renderPublicProducts(products) {
                 <img src="${imageUrl}" 
                      alt="${product.name}"
                      loading="lazy"
-                     onerror="this.src='https://via.placeholder.com/250x250?text=Sem+Imagem'; this.style.opacity='0.5';"
+                     onerror="this.src='${fallbackImage}'; this.style.opacity='0.5';"
                      style="width: 90%; height: 90%; object-fit: contain;">
             </div>
             <div class="product-info">

@@ -615,13 +615,13 @@ img {
 
 /* Classe para adicionar imagem de fundo (personalizável) */
 .hero-background-image {
-    background-image: url('/assets/img/backgound.png');
+    background-image: url('../assets/img/backgound.png');
     background-size: cover; /* 🎯 Preenche todo o container */
     background-repeat: no-repeat;
     background-position: center;
     background-attachment: fixed; /* 🎯 Parallax effect */
     animation: zoomInSlow 1.2s ease-out; /* 🎯 Animação de entrada */
-    background-color: rgba(255, 255, 255, 0.1); /* Fallback se imagem não carregar */
+    background-color: var(--gradiente-verde-2); /* Fallback com gradiente verde se imagem não carregar */
 }
 
 @keyframes zoomInSlow {

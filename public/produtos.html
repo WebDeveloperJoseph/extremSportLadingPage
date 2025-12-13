@@ -447,17 +447,27 @@
 
             emptyMessage.style.display = 'none';
             grid.innerHTML = filteredProducts.map((product, index) => {
-                const imageUrl = product.image?.startsWith('http') ? product.image : window.API_BASE + product.image;
+                const fallbackImage = '/assets/img/img_exemplo.png';
+                let imageUrl = fallbackImage;
+
+                if (product.image) {
+                    if (product.image.startsWith('http')) {
+                        imageUrl = product.image.replace('http://', 'https://');
+                    } else {
+                        const normalizedPath = product.image.startsWith('/') ? product.image : `/${product.image}`;
+                        imageUrl = `${window.API_BASE}${normalizedPath}`;
+                    }
+                }
                 const finalPrice = Number(product.priceCurrent || 0).toFixed(2);
                 const originalPrice = product.priceOld ? Number(product.priceOld).toFixed(2) : null;
                 
                 return `
                 <div class="product-card" style="animation-delay: ${index * 0.05}s">
                     <div class="product-image">
-                        <img src="${imageUrl || 'https://via.placeholder.com/250x250?text=Produto'}" 
+                        <img src="${imageUrl}" 
                              alt="${product.name}"
                              loading="lazy"
-                             onerror="this.src='https://via.placeholder.com/250x250?text=Sem+Imagem'"
+                             onerror="this.src='${fallbackImage}'"
                              style="width: 90%; height: 90%; object-fit: contain;">
                         ${product.discount ? `<span class="product-badge">-${product.discount}%</span>` : ''}
                     </div>
