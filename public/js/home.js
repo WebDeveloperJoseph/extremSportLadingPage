@@ -77,7 +77,34 @@ async function initBanners() {
   }
   
   if (banners.length === 0) {
-    // Se não há banners, mostra um placeholder
+    // Se não há banners, mostra carrossel de produtos
+    const products = await getProducts();
+    const activeProducts = products.filter(p => p.active).slice(0, 8); // Primeiros 8 produtos
+    
+    if (activeProducts.length > 0) {
+      container.innerHTML = activeProducts.map((product, idx) => {
+        const imageUrl = product.image?.startsWith('http') 
+          ? product.image.replace('http://', 'https://')
+          : `${API_BASE}${product.image?.startsWith('/') ? product.image : '/' + product.image}`;
+        
+        const price = Number(product.priceCurrent || 0).toFixed(2);
+        
+        return `
+          <div class="slide${idx===0?' active':''}" style="background: linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95)), url('${imageUrl}'); background-size: cover; background-position: center; background-blend-mode: overlay;">
+            <div class="slide-overlay">
+              <h2>${product.name}</h2>
+              <p style="font-size: 2rem; font-weight: 700; margin: 15px 0;">R$ ${price}</p>
+              <a href="/produtos.html" class="btn-primary">Ver Produtos</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      setupBannerControls();
+      return;
+    }
+    
+    // Fallback se não houver produtos
     container.innerHTML = `
       <div class="slide active" style="background: var(--gradiente-verde-2); display: flex; align-items: center; justify-content: center;">
         <div style="text-align: center; color: white; padding: 40px;">

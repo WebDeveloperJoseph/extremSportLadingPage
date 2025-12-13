@@ -636,10 +636,10 @@ function syncWithPublicSite() {
     }
 }
 
-// Listener para detectar mudanças via outras abas
-window.addEventListener('storage', function(e) {
-    if (e.key === 'productsChanged' && e.newValue === 'true') {
-        console.log('🔔 [SYNC] Detectada mudança em outro lugar - recarregando produtos');
-        loadProducts();
-    }
-});
+// Listener para detectar mudanças via outras abas (DESATIVADO - causava reloads automáticos)
+// window.addEventListener('storage', function(e) {
+//     if (e.key === 'productsChanged' && e.newValue === 'true') {
+//         console.log('🔔 [SYNC] Detectada mudança em outro lugar - recarregando produtos');
+//         loadProducts();
+//     }
+// });
