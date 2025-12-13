@@ -727,6 +727,106 @@ img {
 .banner-carousel .nav.next { right: 10px; }
 
 /* ==========================================
+   CARROSSEL HORIZONTAL DE PRODUTOS
+   ========================================== */
+.horizontal-product-carousel {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 60px 0;
+    overflow: hidden;
+}
+
+.horizontal-product-carousel .section-title {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+    color: var(--cor-verde-principal);
+}
+
+.carousel-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 20px 0;
+}
+
+.carousel-track-horizontal {
+    display: flex;
+    gap: 20px;
+    animation: scrollLeft 30s linear infinite;
+    width: max-content;
+}
+
+.carousel-track-horizontal:hover {
+    animation-play-state: paused;
+}
+
+@keyframes scrollLeft {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.product-card-carousel {
+    flex: 0 0 280px;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.product-card-carousel:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 24px rgba(46, 204, 113, 0.3);
+}
+
+.product-card-carousel img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.product-card-carousel .product-info {
+    padding: 15px;
+}
+
+.product-card-carousel .product-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--cor-texto-escuro);
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.product-card-carousel .product-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--cor-verde-principal);
+    margin-bottom: 10px;
+}
+
+.product-card-carousel .btn-add {
+    width: 100%;
+    padding: 10px;
+    background: var(--gradiente-verde-1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.product-card-carousel .btn-add:hover {
+    transform: scale(1.05);
+}
+
+/* ==========================================
    SEARCH BOX TOP (Página de Produtos)
    ========================================== */
 .search-box-top {
@@ -1128,6 +1228,28 @@ img {
 @media (max-width: 900px) {
     .container {
         padding: 0 16px;
+        /* Carrossel horizontal de produtos - mobile */
+        .horizontal-product-carousel .section-title {
+            font-size: 1.8rem;
+            padding: 0 20px;
+        }
+    
+        .product-card-carousel {
+            flex: 0 0 220px;
+        }
+    
+        .product-card-carousel img {
+            height: 160px;
+        }
+    
+        .product-card-carousel .product-name {
+            font-size: 0.95rem;
+        }
+    
+        .product-card-carousel .product-price {
+            font-size: 1.3rem;
+        }
+
     }
 
     .main-header {

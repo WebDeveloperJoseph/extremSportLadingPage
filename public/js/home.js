@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (products && products.length) {
     localStorage.setItem('products', JSON.stringify(products));
   }
+    await initHorizontalProductCarousel();
   await initCarousels();
   initScrollAnimations();
   
@@ -274,4 +275,42 @@ async function getProducts() {
     if (!resp.ok) throw new Error();
     return resp.json();
   } catch { return []; }
+// 🛍️ CARROSSEL HORIZONTAL DE PRODUTOS
+async function initHorizontalProductCarousel() {
+  const track = document.querySelector('.carousel-track-horizontal');
+  if (!track) return;
+
+  const products = await getProducts();
+  const activeProducts = products.filter(p => p.active);
+  
+  if (activeProducts.length === 0) {
+    track.innerHTML = '<p style="color: #7f8c8d; text-align: center; width: 100%; padding: 40px;">Nenhum produto disponível no momento.</p>';
+    return;
+  }
+
+  // Duplicar produtos para criar efeito infinito
+  const allProducts = [...activeProducts, ...activeProducts];
+  
+  track.innerHTML = allProducts.map(product => {
+    const imageUrl = product.image?.startsWith('http') 
+      ? product.image.replace('http://', 'https://')
+      : `${API_BASE}${product.image?.startsWith('/') ? product.image : '/' + product.image}`;
+    
+    const price = Number(product.priceCurrent || 0).toFixed(2);
+    
+    return `
+      <div class="product-card-carousel" onclick="window.location.href='/produtos.html?id=${product.id}'">
+        <img src="${imageUrl}" alt="${product.name}" onerror="this.src='/assets/img/img_exemplo.png'">
+        <div class="product-info">
+          <div class="product-name">${product.name}</div>
+          <div class="product-price">R$ ${price}</div>
+          <button class="btn-add" onclick="event.stopPropagation(); addToCart(${product.id})">
+            🛒 Adicionar
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 }
