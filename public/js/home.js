@@ -70,16 +70,51 @@ async function initBanners() {
   if (!container) return;
   const list = await getBanners();
   const banners = list.filter(b => !!b.active).sort((a,b)=> (a.ord||0)-(b.ord||0));
-  if (banners.length === 0) return;
-  container.innerHTML = banners.map((b, idx) => `
-    <div class="slide${idx===0?' active':''}" style="background-image:url('${b.image?.startsWith('http') ? b.image : API_BASE + b.image}')">
+  
+  console.log('🎠 [BANNERS] Total de banners ativos:', banners.length);
+  if (banners.length > 0) {
+    console.log('🎠 [BANNERS] Primeiro banner:', banners[0]);
+  }
+  
+  if (banners.length === 0) {
+    // Se não há banners, mostra um placeholder
+    container.innerHTML = `
+      <div class="slide active" style="background: var(--gradiente-verde-2); display: flex; align-items: center; justify-content: center;">
+        <div style="text-align: center; color: white; padding: 40px;">
+          <h2 style="font-size: 2.5rem; margin-bottom: 15px;">🎉 Pretinho Variedades</h2>
+          <p style="font-size: 1.2rem;">Ofertas imperdíveis em breve!</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = banners.map((b, idx) => {
+    // Construir URL da imagem de forma mais robusta
+    let imageUrl = '';
+    if (b.image) {
+      if (b.image.startsWith('http://') || b.image.startsWith('https://')) {
+        // URL completa
+        imageUrl = b.image.replace('http://', 'https://'); // Força HTTPS
+      } else {
+        // Caminho relativo - normaliza
+        const normalizedPath = b.image.startsWith('/') ? b.image : `/${b.image}`;
+        imageUrl = `${API_BASE}${normalizedPath}`;
+      }
+    }
+    
+    console.log(`🎠 [BANNER ${idx}] URL da imagem:`, imageUrl);
+    
+    return `
+    <div class="slide${idx===0?' active':''}" style="background-image:url('${imageUrl}'); background-size: cover; background-position: center;">
       <div class="slide-overlay">
         <h2>${b.title}</h2>
         <p>${b.subtitle||''}</p>
         ${b.link ? `<a href="${b.link}" class="btn-primary">Ver mais</a>` : ''}
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
   setupBannerControls();
 }
 
