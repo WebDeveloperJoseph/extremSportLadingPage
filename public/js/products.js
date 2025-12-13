@@ -262,8 +262,9 @@ document.addEventListener('DOMContentLoaded', setupGlobalSearch);
 
 /**
  * ✨ LISTENER DE SINCRONIZAÇÃO COM ADMIN
- * Quando admin mudar produtos, recarrega automaticamente
+ * DESATIVADO - causava reloads automáticos nas páginas admin
  */
+/*
 window.addEventListener('storage', function(e) {
     if (e.key === 'productsChanged' && e.newValue === 'true') {
         console.log('🔔 [SYNC PUBLIC] Detectada mudança no admin - recarregando produtos...');
@@ -290,6 +291,7 @@ window.addEventListener('storage', function(e) {
         }
     }
 });
+*/
 
 // Verificar sincronização periodicamente (fallback)
 setInterval(function() {
