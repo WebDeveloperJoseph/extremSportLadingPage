@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✅ Adicionar Banner EQUIPE</title>
+  <style>
+    body {
+      font-family: Poppins, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #f5f5f5;
+      text-align: center;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 20px 0;
+    }
+    h1 { color: #0a893f; }
+    .status {
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .loading { 
+      background: #e7f5ff; 
+      color: #1c4995;
+      animation: pulse 1.5s infinite;
+    }
+    .success { 
+      background: #d3f9d8; 
+      color: #2f5233;
+    }
+    .error { 
+      background: #ffe0e0; 
+      color: #5c2e2e;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-radius: 50%;
+      border-top-color: #0a893f;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 20px 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎬 Adicionando Banner EQUIPE</h1>
+    
+    <div id="status" class="status loading">
+      <span class="spinner"></span>
+      Processando...
+    </div>
+
+    <div id="imagePreview"></div>
+    
+    <div id="details"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3333';
+
+    async function addBanner() {
+      try {
+        // 🎯 VERIFICA SE O BANNER JÁ EXISTE
+        console.log('🔍 Verificando se banner EQUIPE já existe...');
+        const listResponse = await fetch(`${API_BASE}/api/banners`);
+        const bannersList = await listResponse.json();
+        
+        const equipeBannerExists = bannersList.some(b => 
+          b.title === 'Conheça Nossa Equipe' && 
+          b.image.includes('EQUIPE.jpeg')
+        );
+        
+        if (equipeBannerExists) {
+          console.log('✅ Banner EQUIPE já existe!');
+          document.getElementById('status').className = 'status success';
+          document.getElementById('status').innerHTML = '✅ Banner EQUIPE já existe no banco de dados!';
+          
+          document.getElementById('details').innerHTML = `
+            <p>O banner foi adicionado anteriormente.</p>
+            <p>🎉 Acesse a página inicial para visualizá-lo!</p>
+            <p>Volte para: <strong><a href="http://127.0.0.1:5500/" target="_blank">http://127.0.0.1:5500/</a></strong></p>
+          `;
+          return;
+        }
+
+        // Dados do banner
+        const bannerData = {
+          image: '/assets/img/EQUIPE.jpeg',
+          title: 'Conheça Nossa Equipe',
+          subtitle: 'Profissionais dedicados ao seu sucesso',
+          link: '',
+          ord: 1,
+          active: true
+        };
+
+        console.log('📤 Adicionando novo banner:', bannerData);
+        
+        // Enviar para API
+        const response = await fetch(`${API_BASE}/api/banners`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bannerData)
+        });
+
+        console.log('Status:', response.status);
+
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(`HTTP ${response.status}: ${error}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ Banner criado:', result);
+
+        // Sucesso!
+        document.getElementById('status').className = 'status success';
+        document.getElementById('status').innerHTML = '✅ Banner adicionado com sucesso!';
+        
+        // Mostrar preview da imagem
+        document.getElementById('imagePreview').innerHTML = `
+          <img src="${bannerData.image}" alt="Banner EQUIPE">
+        `;
+
+        // Mostrar detalhes
+        document.getElementById('details').innerHTML = `
+          <h2>Informações do Banner</h2>
+          <p><strong>ID:</strong> ${result.id}</p>
+          <p><strong>Título:</strong> ${result.title}</p>
+          <p><strong>Subtítulo:</strong> ${result.subtitle}</p>
+          <p><strong>Imagem:</strong> ${result.image}</p>
+          <p><strong>Status:</strong> ${result.active ? '✓ Ativo' : '✗ Inativo'}</p>
+          <p><strong>Ordem:</strong> ${result.ord}</p>
+          <br>
+          <p>🎉 O banner agora está visível na página inicial!</p>
+          <p>Acesse: <strong><a href="http://127.0.0.1:5500/" target="_blank">http://127.0.0.1:5500/</a></strong></p>
+        `;
+
+      } catch (e) {
+        console.error('❌ Erro:', e);
+        document.getElementById('status').className = 'status error';
+        document.getElementById('status').innerHTML = `❌ Erro: ${e.message}`;
+        
+        document.getElementById('details').innerHTML = `
+          <p style="color: #d32f2f; font-size: 16px;">
+            Verifique se o servidor está rodando em http://localhost:3333
+          </p>
+          <p style="color: #666;">
+            No terminal, execute: <strong>npm start</strong> na pasta server/
+          </p>
+        `;
+      }
+    }
+
+    // Executar ao carregar
+    window.addEventListener('load', addBanner);
+  </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Pedidos - Admin</title>
+    <link rel="stylesheet" href="admin-modern.css">
+</head>
+<body class="admin-body">
+
+    <!-- SIDEBAR ADMIN -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-header">
+            <h2>🛒 Admin Panel</h2>
+            <p>Pretinho Variedades</p>
+        </div>
+
+        <nav class=\"sidebar-nav\">
+            <ul>
+                <li><a href=\"index.html\">📦 Produtos</a></li>
+                <li><a href=\"pedidos.html\" class=\"active\">🛍️ Pedidos</a></li>
+                <li><a href="categorias.html">📁 Categorias</a></li>
+                <li><a href="banners.html">🖼️ Banners</a></li>
+                <li><a href="destaques.html">⭐ Destaques</a></li>
+                <li><a href="promocoes.html">🎉 Promoções</a></li>
+                <li><a href="configuracoes.html">⚙️ Configurações</a></li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="../public/index.html" target="_blank" class="btn-view-site">🌐 Ver Site</a>
+            <button id="logoutBtn" class="btn-logout">🚪 Sair</button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="admin-main">
+        <!-- TOPBAR -->
+        <header class="admin-topbar">
+            <div class="topbar-left">
+                <h1>Gerenciar Pedidos</h1>
+            </div>
+            <div class="topbar-right">
+                <select id="filterStatus" class="status-filter">
+                    <option value="">Todos os Status</option>
+                    <option value="pending">Pendente</option>
+                    <option value="processing">Processando</option>
+                    <option value="shipped">Enviado</option>
+                    <option value="delivered">Entregue</option>
+                    <option value="cancelled">Cancelado</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- CONTEÚDO -->
+        <div class="admin-content">
+            <!-- CARDS DE RESUMO -->
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card stat-orange">
+                    <div class="stat-icon">🛍️</div>
+                    <div class="stat-details">
+                        <h3 id="totalOrders">0</h3>
+                        <p>Total de Pedidos</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-blue">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-details">
+                        <h3 id="pendingOrders">0</h3>
+                        <p>Pedidos Pendentes</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-green">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-details">
+                        <h3 id="totalRevenue">R$ 0,00</h3>
+                        <p>Faturamento Total</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-purple">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-details">
+                        <h3 id="shippedOrders">0</h3>
+                        <p>Pedidos Enviados</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID DE PEDIDOS -->
+            <div class="orders-grid" id="ordersGrid">
+                <!-- Pedidos serão carregados via JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DETALHES DO PEDIDO -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Detalhes do Pedido <span id="orderIdModal"></span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+
+            <div id="orderDetailsContent" class="order-details" style="padding: 30px;">
+                <!-- Detalhes serão carregados via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.API_BASE = localStorage.getItem('API_BASE') || (window.location.origin.includes('vercel') || window.location.origin.includes('localhost') ? 'https://extremsportladingpage-production.up.railway.app' : window.location.origin);
+    </script>
+    <script src="../public/js/admin-pedidos.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧹 Limpar Banners Duplicados</title>
+  <style>
+    body {
+      font-family: Poppins, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 20px 0;
+    }
+    h1 { color: #0a893f; text-align: center; }
+    button {
+      background: #0a893f;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #067a31;
+    }
+    .banner-item {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .banner-info {
+      text-align: left;
+    }
+    .banner-info strong {
+      color: #0a893f;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+    }
+    .delete-btn {
+      background: #d32f2f;
+    }
+    .delete-btn:hover {
+      background: #b71c1c;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .success {
+      background: #d3f9d8;
+      color: #2f5233;
+    }
+    .error {
+      background: #ffe0e0;
+      color: #5c2e2e;
+    }
+    .info {
+      background: #e7f5ff;
+      color: #1c4995;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🧹 Gerenciador de Banners</h1>
+    
+    <div id="actions">
+      <button onclick="carregarBanners()">📋 Carregar Banners</button>
+      <button onclick="removerDuplicados()" style="background: #ff9800;">🗑️ Remover Duplicados</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="banners"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3333';
+    let todosBanners = [];
+
+    async function carregarBanners() {
+      try {
+        const response = await fetch(`${API_BASE}/api/banners`);
+        if (!response.ok) throw new Error('Erro ao carregar banners');
+        
+        todosBanners = await response.json();
+        
+        // Agrupar por título/imagem
+        const grupos = {};
+        todosBanners.forEach(b => {
+          const chave = `${b.title}|${b.image}`;
+          if (!grupos[chave]) grupos[chave] = [];
+          grupos[chave].push(b);
+        });
+
+        // Exibir
+        const html = Object.entries(grupos).map(([chave, banners]) => {
+          const isDuplicado = banners.length > 1;
+          return `
+            <div style="border-left: 4px solid ${isDuplicado ? '#d32f2f' : '#0a893f'}; padding-left: 15px; margin: 15px 0;">
+              <h3>${banners[0].title}</h3>
+              <p><strong>Total:</strong> ${banners.length} ${isDuplicado ? '⚠️ DUPLICADO' : '✓'}</p>
+              ${banners.map(b => `
+                <div class="banner-item">
+                  <div class="banner-info">
+                    <p>🆔 ID: <strong>${b.id}</strong></p>
+                    <p>📸 ${b.image}</p>
+                    <p>⏱️ Criado: ${new Date(b.createdAt).toLocaleString('pt-BR')}</p>
+                  </div>
+                  <div class="actions">
+                    <button class="delete-btn" onclick="deletarBanner(${b.id})">🗑️ Deletar</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('banners').innerHTML = html || '<p>Nenhum banner encontrado</p>';
+        document.getElementById('status').innerHTML = `<div class="status info">✓ ${todosBanners.length} banners carregados</div>`;
+
+      } catch (e) {
+        document.getElementById('status').innerHTML = `<div class="status error">❌ Erro: ${e.message}</div>`;
+      }
+    }
+
+    async function removerDuplicados() {
+      try {
+        // Agrupar por título/imagem
+        const grupos = {};
+        todosBanners.forEach(b => {
+          const chave = `${b.title}|${b.image}`;
+          if (!grupos[chave]) grupos[chave] = [];
+          grupos[chave].push(b);
+        });
+
+        let deletados = 0;
+        for (const [chave, banners] of Object.entries(grupos)) {
+          if (banners.length > 1) {
+            // Manter o primeiro, deletar o resto
+            for (let i = 1; i < banners.length; i++) {
+              await fetch(`${API_BASE}/api/banners/${banners[i].id}`, {
+                method: 'DELETE'
+              });
+              deletados++;
+              console.log(`🗑️ Deletado: ${banners[i].id} - ${chave}`);
+            }
+          }
+        }
+
+        if (deletados === 0) {
+          document.getElementById('status').innerHTML = `<div class="status info">✓ Nenhum duplicado encontrado</div>`;
+        } else {
+          document.getElementById('status').innerHTML = `<div class="status success">✅ ${deletados} banner(s) duplicado(s) removido(s)!</div>`;
+          setTimeout(() => carregarBanners(), 1000);
+        }
+
+      } catch (e) {
+        document.getElementById('status').innerHTML = `<div class="status error">❌ Erro: ${e.message}</div>`;
+      }
+    }
+
+    async function deletarBanner(id) {
+      if (!confirm(`Tem certeza que deseja deletar o banner ID ${id}?`)) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/banners/${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (!response.ok) throw new Error('Erro ao deletar');
+        
+        document.getElementById('status').innerHTML = `<div class="status success">✅ Banner deletado com sucesso!</div>`;
+        setTimeout(() => carregarBanners(), 500);
+
+      } catch (e) {
+        document.getElementById('status').innerHTML = `<div class="status error">❌ Erro: ${e.message}</div>`;
+      }
+    }
+
+    // Carregar ao entrar
+    window.addEventListener('load', carregarBanners);
+  </script>
+</body>
+</html>

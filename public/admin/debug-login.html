@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Login</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+        .debug-box { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            max-width: 600px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover { background: #764ba2; }
+        .output {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="debug-box">
+        <h1>🔍 Debug Login Admin</h1>
+        
+        <button class="test-btn" onclick="testCredentials()">Testar Credenciais</button>
+        <button class="test-btn" onclick="testEncryption()">Testar Encriptação</button>
+        <button class="test-btn" onclick="testSession()">Testar Sessão</button>
+        <button class="test-btn" onclick="clearAll()">Limpar Tudo</button>
+        
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'info';
+            output.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Copiar funções de encriptação
+        function simpleEncrypt(str, key = 'pretinho2025') {
+            return btoa(String.fromCharCode(...str.split('').map((char, i) => char.charCodeAt(0) ^ key.charCodeAt(i % key.length))));
+        }
+
+        function simpleDecrypt(encoded, key = 'pretinho2025') {
+            try {
+                return atob(encoded).split('').map((char, i) => String.fromCharCode(char.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join('');
+            } catch(e) {
+                return null;
+            }
+        }
+
+        function testCredentials() {
+            output.innerHTML = '';
+            log('Testando credenciais...', 'info');
+            
+            const username = 'admin';
+            const password = 'admin123';
+            
+            const ADMIN_CREDENTIALS = {
+                username: 'admin',
+                password: 'admin123'
+            };
+
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                log('✅ Credenciais VÁLIDAS!', 'success');
+                log(`Usuário: ${username}`, 'success');
+                log(`Senha: ${password}`, 'success');
+            } else {
+                log('❌ Credenciais INVÁLIDAS!', 'error');
+            }
+        }
+
+        function testEncryption() {
+            output.innerHTML = '';
+            log('Testando encriptação...', 'info');
+            
+            const username = 'admin';
+            const password = 'admin123';
+            
+            const encUser = simpleEncrypt(username);
+            const encPass = simpleEncrypt(password);
+            const decUser = simpleDecrypt(encUser);
+            const decPass = simpleDecrypt(encPass);
+            
+            log(`Username original: ${username}`, 'info');
+            log(`Username encriptado: ${encUser}`, 'success');
+            log(`Username descriptografado: ${decUser}`, 'success');
+            
+            log(`Password original: ${password}`, 'info');
+            log(`Password encriptado: ${encPass}`, 'success');
+            log(`Password descriptografado: ${decPass}`, 'success');
+            
+            if (decUser === username && decPass === password) {
+                log('✅ Encriptação/Decriptação OK!', 'success');
+            } else {
+                log('❌ Erro na encriptação!', 'error');
+            }
+        }
+
+        function testSession() {
+            output.innerHTML = '';
+            log('Testando sessão...', 'info');
+            
+            // Criar sessão
+            const sessionToken = btoa(JSON.stringify({login: Date.now(), hash: Math.random()}));
+            sessionStorage.setItem('adminSession', sessionToken);
+            
+            log(`Token criado: ${sessionToken.substring(0, 50)}...`, 'success');
+            
+            // Verificar
+            const storedToken = sessionStorage.getItem('adminSession');
+            if (storedToken === sessionToken) {
+                log('✅ Sessão armazenada corretamente!', 'success');
+                log(`Verificando: ${storedToken.substring(0, 50)}...`, 'success');
+            } else {
+                log('❌ Erro ao armazenar sessão!', 'error');
+            }
+        }
+
+        function clearAll() {
+            output.innerHTML = '';
+            sessionStorage.clear();
+            localStorage.clear();
+            log('🗑️ Tudo limpo!', 'info');
+        }
+
+        // Log inicial
+        log('Debug console pronto! Use os botões para testar.', 'info');
+    </script>
+</body>
+</html>

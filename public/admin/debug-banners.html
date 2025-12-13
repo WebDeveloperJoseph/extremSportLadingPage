@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Debug Banners - Teste Completo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+        }
+        h1 { color: #667eea; margin-bottom: 30px; text-align: center; }
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .section h2 {
+            color: #667eea;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 150px;
+        }
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .log-box {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .log-line { margin-bottom: 6px; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .info { color: #3b82f6; }
+        .warning { color: #f59e0b; }
+        input[type="file"] { display: none; }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .result-box {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Debug Completo - Banners</h1>
+
+        <!-- Teste de Conexão -->
+        <div class="section">
+            <h2>🌐 Teste de Conexão</h2>
+            <button onclick="testConnection()">🔍 Testar Conexão API</button>
+            <button onclick="testUploadEndpoint()">📤 Testar Upload Endpoint</button>
+            <button onclick="testBannersEndpoint()">🎬 Testar Banners Endpoint</button>
+            <div class="log-box" id="connectionLog"></div>
+        </div>
+
+        <!-- Teste de Upload -->
+        <div class="section">
+            <h2>📤 Teste de Upload</h2>
+            <input type="file" id="fileInput" accept="image/*">
+            <button onclick="document.getElementById('fileInput').click()">📁 Selecionar Arquivo</button>
+            <button onclick="testUploadFile()">📤 Fazer Upload Agora</button>
+            <div class="result-box" id="uploadResult" style="display: none;">
+                <strong>Resultado Upload:</strong>
+                <pre id="uploadResultText"></pre>
+            </div>
+            <div class="log-box" id="uploadLog"></div>
+        </div>
+
+        <!-- Criar Banner -->
+        <div class="section">
+            <h2>🎬 Criar Banner Teste</h2>
+            <div class="form-group">
+                <label>URL da Imagem (use o resultado do upload acima):</label>
+                <input type="text" id="bannerImage" placeholder="http://localhost:3333/uploads/..." />
+            </div>
+            <div class="form-group">
+                <label>Título:</label>
+                <input type="text" id="bannerTitle" placeholder="Meu Banner Teste" value="TESTE BANNER" />
+            </div>
+            <div class="form-group">
+                <label>Subtítulo:</label>
+                <input type="text" id="bannerSubtitle" placeholder="Subtítulo opcional" value="Teste de Sincronização" />
+            </div>
+            <div class="form-group">
+                <label>Link (opcional):</label>
+                <input type="text" id="bannerLink" placeholder="#ofertas" value="#ofertas" />
+            </div>
+            <button onclick="createBannerTest()">✅ Criar Banner Teste</button>
+            <button onclick="listBanners()">📋 Listar Todos os Banners</button>
+            <div class="log-box" id="bannerLog"></div>
+        </div>
+
+        <!-- Sincronização -->
+        <div class="section">
+            <h2>🔄 Teste de Sincronização</h2>
+            <button onclick="testSync()">🔄 Testar Sincronização</button>
+            <button onclick="checkPublicSite()">🌐 Verificar Site Público</button>
+            <div class="log-box" id="syncLog"></div>
+        </div>
+
+        <!-- Instruções -->
+        <div class="section" style="border-left-color: #10b981;">
+            <h2 style="color: #10b981;">📝 Como Usar Este Debug:</h2>
+            <ol style="margin-left: 20px; line-height: 1.8;">
+                <li><strong>Teste de Conexão:</strong> Verifica se a API está respondendo</li>
+                <li><strong>Teste de Upload:</strong> Seleciona uma foto e faz upload</li>
+                <li><strong>Criar Banner:</strong> Usa a URL do upload para criar um banner</li>
+                <li><strong>Sincronização:</strong> Verifica se o banner aparece no site público</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3333';
+        let uploadedUrl = null;
+
+        // Adicionar linha ao log
+        function addLog(elementId, message, type = 'info') {
+            const log = document.getElementById(elementId);
+            const line = document.createElement('div');
+            line.className = `log-line ${type}`;
+            const time = new Date().toLocaleTimeString();
+            line.textContent = `[${time}] ${message}`;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Limpar log
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        // Teste de Conexão
+        async function testConnection() {
+            clearLog('connectionLog');
+            addLog('connectionLog', '🌐 Testando conexão...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/api/banners`);
+                if (response.ok) {
+                    addLog('connectionLog', '✅ API está respondendo!', 'success');
+                    const data = await response.json();
+                    addLog('connectionLog', `📦 Banners encontrados: ${data.length}`, 'success');
+                } else {
+                    addLog('connectionLog', `❌ HTTP ${response.status}`, 'error');
+                }
+            } catch (e) {
+                addLog('connectionLog', `❌ Erro: ${e.message}`, 'error');
+            }
+        }
+
+        // Teste Upload Endpoint
+        async function testUploadEndpoint() {
+            clearLog('connectionLog');
+            addLog('connectionLog', '📤 Testando endpoint de upload...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/api/upload`);
+                if (response.status === 405) {
+                    addLog('connectionLog', '✅ Endpoint existe (rejeita GET, esperado)', 'success');
+                } else {
+                    addLog('connectionLog', `🔶 Status: ${response.status}`, 'warning');
+                }
+            } catch (e) {
+                addLog('connectionLog', `❌ Erro: ${e.message}`, 'error');
+            }
+        }
+
+        // Teste Banners Endpoint
+        async function testBannersEndpoint() {
+            clearLog('connectionLog');
+            addLog('connectionLog', '🎬 Testando endpoint de banners...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/api/banners`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addLog('connectionLog', `✅ Banners carregados: ${data.length}`, 'success');
+                    data.forEach((b, i) => {
+                        addLog('connectionLog', `  ${i+1}. ${b.title} (ID: ${b.id}, Ativo: ${b.active})`, 'info');
+                    });
+                } else {
+                    addLog('connectionLog', `❌ HTTP ${response.status}`, 'error');
+                }
+            } catch (e) {
+                addLog('connectionLog', `❌ Erro: ${e.message}`, 'error');
+            }
+        }
+
+        // Fazer Upload
+        async function testUploadFile() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                addLog('uploadLog', '❌ Nenhum arquivo selecionado', 'error');
+                return;
+            }
+            clearLog('uploadLog');
+            addLog('uploadLog', `📤 Uploadando: ${file.name}`, 'info');
+            
+            const form = new FormData();
+            form.append('file', file);
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/upload`, {
+                    method: 'POST',
+                    body: form
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    addLog('uploadLog', `✅ Upload bem-sucedido!`, 'success');
+                    addLog('uploadLog', `📎 URL: ${data.url}`, 'info');
+                    document.getElementById('bannerImage').value = data.url;
+                    uploadedUrl = data.url;
+                    
+                    // Mostrar resultado
+                    document.getElementById('uploadResult').style.display = 'block';
+                    document.getElementById('uploadResultText').textContent = JSON.stringify(data, null, 2);
+                } else {
+                    addLog('uploadLog', `❌ HTTP ${response.status}`, 'error');
+                    const text = await response.text();
+                    addLog('uploadLog', `Resposta: ${text}`, 'error');
+                }
+            } catch (e) {
+                addLog('uploadLog', `❌ Erro: ${e.message}`, 'error');
+            }
+        }
+
+        // Criar Banner
+        async function createBannerTest() {
+            clearLog('bannerLog');
+            const image = document.getElementById('bannerImage').value;
+            const title = document.getElementById('bannerTitle').value;
+            const subtitle = document.getElementById('bannerSubtitle').value;
+            const link = document.getElementById('bannerLink').value;
+
+            if (!image || !title) {
+                addLog('bannerLog', '❌ Informe imagem e título', 'error');
+                return;
+            }
+
+            addLog('bannerLog', '🎬 Criando banner...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/api/banners`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image,
+                        title,
+                        subtitle,
+                        link,
+                        ord: 1,
+                        active: true
+                    })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    addLog('bannerLog', `✅ Banner criado!`, 'success');
+                    addLog('bannerLog', `🆔 ID: ${data.id}`, 'success');
+                    addLog('bannerLog', `📋 Título: ${data.title}`, 'info');
+                    testSync(); // Testar sincronização automaticamente
+                } else {
+                    addLog('bannerLog', `❌ HTTP ${response.status}`, 'error');
+                    const text = await response.text();
+                    addLog('bannerLog', `Erro: ${text}`, 'error');
+                }
+            } catch (e) {
+                addLog('bannerLog', `❌ Erro: ${e.message}`, 'error');
+            }
+        }
+
+        // Listar Banners
+        async function listBanners() {
+            clearLog('bannerLog');
+            addLog('bannerLog', '📋 Listando banners...', 'info');
+            try {
+                const response = await fetch(`${API_BASE}/api/banners`);
+                const data = await response.json();
+                addLog('bannerLog', `✅ ${data.length} banner(s) encontrado(s)`, 'success');
+                data.forEach((b, i) => {
+                    addLog('bannerLog', `${i+1}. [${b.active ? '✓' : '✗'}] ${b.title} (ID: ${b.id}, Ordem: ${b.ord})`, 'info');
+                });
+            } catch (e) {
+                addLog('bannerLog', `❌ Erro: ${e.message}`, 'error');
+            }
+        }
+
+        // Teste de Sincronização
+        function testSync() {
+            clearLog('syncLog');
+            addLog('syncLog', '🔄 Disparando evento de sincronização...', 'info');
+            localStorage.setItem('bannersChanged', 'true');
+            localStorage.setItem('lastBannersSync', new Date().toISOString());
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'bannersChanged',
+                newValue: 'true',
+                storageArea: localStorage
+            }));
+            addLog('syncLog', '✅ Evento disparado!', 'success');
+            addLog('syncLog', '💡 Abra o site público em outra aba para ver a sincronização', 'info');
+        }
+
+        // Verificar site público
+        function checkPublicSite() {
+            clearLog('syncLog');
+            addLog('syncLog', '🌐 Verificando site público...', 'info');
+            window.open(`${API_BASE}`, '_blank');
+            addLog('syncLog', '✅ Site público aberto em nova aba', 'success');
+        }
+
+        // Inicializar
+        addLog('connectionLog', '✅ Debug carregado. Pronto para testes!', 'success');
+    </script>
+</body>
+</html>
