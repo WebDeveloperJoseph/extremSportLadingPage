@@ -50,7 +50,7 @@ try {
 const uploadsPath = path.join(__dirname, '..', 'uploads');
 const publicPath = path.join(__dirname, '..', '..', 'public');
 const adminPath = path.join(__dirname, '..', '..', 'admin');
-const assetsPath = path.join(__dirname, '..', '..', 'assets');
+const assetsPath = path.join(__dirname, '..', 'assets'); // Mudou para dentro de server/
 
 console.log('📁 Pasta de uploads:', uploadsPath);
 console.log('📁 Pasta de public:', publicPath);
